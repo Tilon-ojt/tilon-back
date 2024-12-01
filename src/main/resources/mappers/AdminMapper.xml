@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tilon.ojt_back.dao.user.AdminMapper">
+ <select id="getAdminList" resultType="com.tilon.ojt_back.domain.user.AdminResponseDTO">
+        SELECT 
+            admin_id AS adminId, 
+            empno, 
+            password, 
+            admin_name AS adminName, 
+            role, 
+            created_at AS createdAt, 
+            updated_at AS updatedAt 
+        FROM 
+            admin
+    </select>
+
+
+ </mapper>
