@@ -14,6 +14,8 @@ public class AdminService {
     private AdminMapper adminMapper;
 
     public List<AdminResponseDTO> getAdminList() {
+        //test 완료 디비 세팅 끝!
         return adminMapper.getAdminList();
+
     }
 }
