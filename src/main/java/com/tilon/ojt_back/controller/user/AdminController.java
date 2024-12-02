@@ -11,17 +11,15 @@ import com.tilon.ojt_back.service.user.AdminService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
-
-
 @RestController
 @RequestMapping("/user")
 public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    @GetMapping("/list")
+    @GetMapping("/")
     public List<AdminResponseDTO> getMethodName() {
         return adminService.getAdminList();
     }
-    
+
 }
