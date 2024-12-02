@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.tilon.ojt_back.dao.homepage.PostMapper;
 import com.tilon.ojt_back.domain.homepage.PostResponseDTO;
 import com.tilon.ojt_back.domain.homepage.PostCategory;
+import com.tilon.ojt_back.domain.homepage.PostRequestDTO;
 
 @Service
 public class PostService {
@@ -16,5 +17,10 @@ public class PostService {
     // post 조회
     public List<PostResponseDTO> getPost(PostCategory category) {
         return postMapper.getPostRow(category);
+    }
+
+    // news 작성
+    public void createNews(PostRequestDTO param) {
+        postMapper.createNewsRow(param);
     }
 }

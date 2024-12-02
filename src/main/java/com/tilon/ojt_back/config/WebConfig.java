@@ -21,4 +21,3 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/"); // Spring Boot의 기본 정적 리소스 경로 사용
     }
 }
-

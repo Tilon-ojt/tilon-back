@@ -14,4 +14,11 @@
         ORDER BY created_at DESC
         LIMIT 3;
     </select>
+
+    <!-- news 작성 -->
+    <insert id="createNewsRow"
+            parameterType="com.tilon.ojt_back.domain.homepage.PostRequestDTO">
+        INSERT INTO post (title, category, status, link, image_url)
+        VALUES (#{title}, #{category}, #{status}, #{link}, #{image_url});
+    </insert>
 </mapper>
