@@ -1,14 +1,10 @@
-package com.tilon.ojt_back.domain.homepage;
+package com.tilon.ojt_back.domain.Management;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+import lombok.Data;
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class PostResponseDTO {
+public class PostRequestDTO {
     private int post_id;
     private String title;
     private String content;

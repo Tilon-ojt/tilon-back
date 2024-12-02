@@ -1,12 +1,12 @@
-package com.tilon.ojt_back.dao.homepage;
+package com.tilon.ojt_back.dao.Management;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.tilon.ojt_back.domain.homepage.PostResponseDTO;
-import com.tilon.ojt_back.domain.homepage.PostCategory;
-import com.tilon.ojt_back.domain.homepage.PostRequestDTO;
+import com.tilon.ojt_back.domain.Management.PostCategory;
+import com.tilon.ojt_back.domain.Management.PostRequestDTO;
+import com.tilon.ojt_back.domain.Management.PostResponseDTO;
 
 @Mapper
 public interface PostMapper {
