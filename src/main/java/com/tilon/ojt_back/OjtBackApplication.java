@@ -9,5 +9,4 @@ public class OjtBackApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(OjtBackApplication.class, args);
 	}
-
 }

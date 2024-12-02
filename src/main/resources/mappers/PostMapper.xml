@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tilon.ojt_back.dao.homepage.PostMapper">
+
+    <!-- post 조회 --> 
+    <select id="getPostRow"
+            parameterType="com.tilon.ojt_back.domain.homepage.PostCategory"
+            resultType="com.tilon.ojt_back.domain.homepage.PostResponseDTO">
+        SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, link, image_url
+        FROM post
+        WHERE category = #{category}
+        ORDER BY created_at DESC
+        LIMIT 3;
+    </select>
+
+    <!-- news 작성 -->
+    <insert id="createNewsRow"
+            parameterType="com.tilon.ojt_back.domain.homepage.PostRequestDTO">
+        INSERT INTO post (title, category, status, link, image_url)
+        VALUES (#{title}, #{category}, #{status}, #{link}, #{image_url});
+    </insert>
+</mapper>
