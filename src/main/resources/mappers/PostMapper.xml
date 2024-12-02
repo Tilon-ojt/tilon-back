@@ -4,7 +4,7 @@
 
 <mapper namespace="com.tilon.ojt_back.dao.homepage.PostMapper">
 
-    <!-- PR 조회 --> 
+    <!-- INSIGHT 조회 --> 
     <select id="getInsightRow"
             resultType="com.tilon.ojt_back.domain.homepage.PostResponseDTO">
         SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, link, image_url
@@ -12,5 +12,15 @@
         WHERE category = 'INSIGHT'
         ORDER BY created_at DESC
         LIMIT 3;
-    </select>    
+    </select>
+
+    <!-- PR 조회 -->
+    <select id="getPrRow"
+            resultType="com.tilon.ojt_back.domain.homepage.PostResponseDTO">
+        SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, link, image_url
+        FROM post
+        WHERE category = 'PR'
+        ORDER BY created_at DESC
+        LIMIT 3;
+    </select>
 </mapper>

@@ -17,8 +17,15 @@ public class PostController {
     @Autowired
     private PostService postService;
 
+    // 인사이트 조회
     @GetMapping("/insight")
     public List<PostResponseDTO> getInsight() {
         return postService.getInsight();
+    }
+
+    // PR 조회
+    @GetMapping("/pr")
+    public List<PostResponseDTO> getPr() {
+        return postService.getPr();
     }
 }

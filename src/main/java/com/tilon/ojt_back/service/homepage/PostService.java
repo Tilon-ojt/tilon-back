@@ -12,7 +12,13 @@ import com.tilon.ojt_back.domain.homepage.PostResponseDTO;
 public class PostService {
     @Autowired private PostMapper postMapper;
 
+    // 인사이트 조회
     public List<PostResponseDTO> getInsight() {
         return postMapper.getInsightRow();
+    }
+
+    // PR 조회
+    public List<PostResponseDTO> getPr() {
+        return postMapper.getPrRow();
     }
 }
