@@ -16,5 +16,21 @@
             admin
     </select>
 
+    <!-- empno로 사용자 정보를 조회하는 쿼리 추가 -->
+    <select id="getUserByEmpno" parameterType="string" resultType="com.tilon.ojt_back.domain.user.AdminResponseDTO">
+        SELECT 
+            admin_id AS adminId, 
+            empno, 
+            password, 
+            admin_name AS adminName, 
+            role, 
+            created_at AS createdAt, 
+            updated_at AS updatedAt 
+        FROM 
+            admin
+        WHERE 
+            empno = #{empno}
+    </select>
+
 
  </mapper>
