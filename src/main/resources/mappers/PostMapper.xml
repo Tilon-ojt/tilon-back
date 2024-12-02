@@ -5,7 +5,6 @@
 <mapper namespace="com.tilon.ojt_back.dao.homepage.PostMapper">
 
     <!-- PR 조회 --> 
-
     <select id="getInsightRow"
             resultType="com.tilon.ojt_back.domain.homepage.PostResponseDTO">
         SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, link, image_url

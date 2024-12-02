@@ -1,8 +1,5 @@
 package com.tilon.ojt_back.domain.homepage;
 
-import com.tilon.ojt_back.domain.homepage.PostCategory;
-import com.tilon.ojt_back.domain.homepage.PostStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,14 +8,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostResponseDTO {
-    private int postId;
+    private int post_id;
     private String title;
     private String content;
     private PostCategory category;
-    private int adminId;
-    private String createdAt;
-    private String updatedAt;
+    private int admin_id;
+    private String created_at;
+    private String updated_at;
     private PostStatus status;
     private String link;
-    private String imageUrl;
+    private String image_url;
 }
