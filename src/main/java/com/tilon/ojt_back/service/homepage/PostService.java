@@ -28,4 +28,9 @@ public class PostService {
     public void updatePost(PostRequestDTO param) {
         postMapper.updatePostRow(param);
     }
+
+    // post 삭제
+    public void deletePost(int post_id) {
+        postMapper.deletePostRow(post_id);
+    }
 }

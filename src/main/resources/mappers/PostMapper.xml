@@ -29,4 +29,11 @@
         SET title = #{title}, content = #{content}, status = #{status}, link = #{link}, image_url = #{image_url}
         WHERE post_id = #{post_id};
     </update>
+
+    <!-- post 삭제 --> 
+    <delete id="deletePostRow"
+            parameterType="int">
+        DELETE FROM post
+        WHERE post_id = #{post_id};
+    </delete>
 </mapper>

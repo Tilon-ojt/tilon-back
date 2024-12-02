@@ -18,4 +18,7 @@ public interface PostMapper {
 
     // post 수정
     public void updatePostRow(PostRequestDTO param);
+
+    // post 삭제
+    public void deletePostRow(int post_id);
 }
