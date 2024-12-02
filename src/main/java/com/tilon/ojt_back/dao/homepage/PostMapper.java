@@ -13,6 +13,9 @@ public interface PostMapper {
     // post 조회
     public List<PostResponseDTO> getPostRow(PostCategory category);
 
-    // news 작성
-    public void createNewsRow(PostRequestDTO param);
+    // post 작성
+    public void createPostRow(PostRequestDTO param);
+
+    // post 수정
+    public void updatePostRow(PostRequestDTO param);
 }

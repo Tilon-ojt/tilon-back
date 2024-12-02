@@ -19,8 +19,13 @@ public class PostService {
         return postMapper.getPostRow(category);
     }
 
-    // news 작성
-    public void createNews(PostRequestDTO param) {
-        postMapper.createNewsRow(param);
+    // post 작성
+    public void createPost(PostRequestDTO param) {
+        postMapper.createPostRow(param);
+    }
+
+    // post 수정
+    public void updatePost(PostRequestDTO param) {
+        postMapper.updatePostRow(param);
     }
 }

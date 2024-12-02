@@ -15,10 +15,18 @@
         LIMIT 3;
     </select>
 
-    <!-- news 작성 -->
-    <insert id="createNewsRow"
+    <!-- post 작성 -->
+    <insert id="createPostRow"
             parameterType="com.tilon.ojt_back.domain.homepage.PostRequestDTO">
-        INSERT INTO post (title, category, status, link, image_url)
-        VALUES (#{title}, #{category}, #{status}, #{link}, #{image_url});
+        INSERT INTO post (title, content, category, admin_id, status, link, image_url)
+        VALUES (#{title}, #{content}, #{category}, #{admin_id}, #{status}, #{link}, #{image_url});
     </insert>
+
+    <!-- post 수정 -->
+    <update id="updatePostRow"
+            parameterType="com.tilon.ojt_back.domain.homepage.PostRequestDTO">
+        UPDATE post
+        SET title = #{title}, content = #{content}, status = #{status}, link = #{link}, image_url = #{image_url}
+        WHERE post_id = #{post_id};
+    </update>
 </mapper>
