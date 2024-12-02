@@ -1,21 +1,8 @@
 package com.tilon.ojt_back.service.user;
 
-import java.util.List;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.tilon.ojt_back.dao.user.AdminMapper;
-import com.tilon.ojt_back.domain.user.AdminResponseDTO;
-
-@Service
-public class AdminService {
-    @Autowired
-    private AdminMapper adminMapper;
-
-    public List<AdminResponseDTO> getAdminList() {
-        //test 완료 디비 세팅 끝!
-        return adminMapper.getAdminList();
-
-    }
+public interface AdminService {
+    UserDetails loadUserByUsername(String empno) throws UsernameNotFoundException;
 }

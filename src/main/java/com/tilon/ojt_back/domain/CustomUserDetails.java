@@ -19,8 +19,8 @@ public class CustomUserDetails implements UserDetails {
         this.empno = empno;
         this.adminName = adminName;
         this.password = password;
-        this.authorities = authorities;
-        this.role = role;
+        this.authorities = authorities; // 사용자 권한 목록 : 세부적인 권한
+        this.role = role; //사용자의 일반적인 역할 
     }
 
     @Override
