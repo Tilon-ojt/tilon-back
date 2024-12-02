@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tilon.ojt_back.domain.homepage.PostCategory;
 import com.tilon.ojt_back.domain.homepage.PostResponseDTO;
 import com.tilon.ojt_back.service.homepage.PostService;
 
@@ -17,15 +19,10 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    // 인사이트 조회
-    @GetMapping("/insight")
-    public List<PostResponseDTO> getInsight() {
-        return postService.getInsight();
-    }
-
-    // PR 조회
-    @GetMapping("/pr")
-    public List<PostResponseDTO> getPr() {
-        return postService.getPr();
+    // post 조회
+    @GetMapping("/post")
+    public List<PostResponseDTO> getPost(
+        @RequestParam(name = "category") PostCategory category){
+        return postService.getPost(category);
     }
 }

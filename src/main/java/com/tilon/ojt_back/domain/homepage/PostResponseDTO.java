@@ -3,8 +3,7 @@ package com.tilon.ojt_back.domain.homepage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -15,8 +14,8 @@ public class PostResponseDTO {
     private String content;
     private PostCategory category;
     private int admin_id;
-    private Timestamp created_at;
-    private Timestamp updated_at;
+    private LocalDateTime created_at;
+    private LocalDateTime updated_at;
     private PostStatus status;
     private String link;
     private String image_url;

@@ -7,18 +7,14 @@ import org.springframework.stereotype.Service;
 
 import com.tilon.ojt_back.dao.homepage.PostMapper;
 import com.tilon.ojt_back.domain.homepage.PostResponseDTO;
+import com.tilon.ojt_back.domain.homepage.PostCategory;
 
 @Service
 public class PostService {
     @Autowired private PostMapper postMapper;
 
-    // 인사이트 조회
-    public List<PostResponseDTO> getInsight() {
-        return postMapper.getInsightRow();
-    }
-
-    // PR 조회
-    public List<PostResponseDTO> getPr() {
-        return postMapper.getPrRow();
+    // post 조회
+    public List<PostResponseDTO> getPost(PostCategory category) {
+        return postMapper.getPostRow(category);
     }
 }

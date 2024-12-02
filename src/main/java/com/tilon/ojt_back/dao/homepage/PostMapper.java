@@ -5,11 +5,9 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.tilon.ojt_back.domain.homepage.PostResponseDTO;
-
+import com.tilon.ojt_back.domain.homepage.PostCategory;
 @Mapper
 public interface PostMapper {
-    // 인사이트 조회
-    public List<PostResponseDTO> getInsightRow();
-    // PR 조회
-    public List<PostResponseDTO> getPrRow();
+    // post 조회
+    public List<PostResponseDTO> getPostRow(PostCategory category);
 }
