@@ -30,6 +30,22 @@
         WHERE post_id = #{post_id};
     </update>
 
+    <!-- post status 수정 --> 
+    <update id="updatePostStatusRow"
+            parameterType="java.util.Map">
+        UPDATE post
+        SET status = #{status}
+        WHERE post_id = #{post_id};
+    </update>
+
+    <!-- post fix 수정 --> 
+    <update id="updatePostFixRow"
+            parameterType="java.util.Map">
+        UPDATE post
+        SET fix = #{fix}
+        WHERE post_id = #{post_id};
+    </update>
+
     <!-- post 삭제 --> 
     <delete id="deletePostRow"
             parameterType="int">

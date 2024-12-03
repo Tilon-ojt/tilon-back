@@ -1,8 +1,6 @@
 package com.tilon.ojt_back.service.homepage;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.tilon.ojt_back.dao.homepage.UserMapper;
 import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostResponseDTO;
-import com.tilon.ojt_back.domain.manage.PostStatus;
 
 @Service
 public class UserService {

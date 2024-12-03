@@ -1,7 +1,6 @@
 package com.tilon.ojt_back.dao.homepage;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 

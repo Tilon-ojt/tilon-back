@@ -22,21 +22,13 @@ public class UserController {
 
     // user의 post 조회
     @GetMapping("/post")
-    public ResponseEntity<List<PostResponseDTO>> getPost(
-        @RequestParam(name = "category") PostCategory category) {
-
-        System.out.println(category);
-
+    public ResponseEntity<List<PostResponseDTO>> getPost(@RequestParam(name = "category") PostCategory category) {
         return ResponseEntity.ok(userService.getPost(category));
     }
 
     // user의 homepage 조회
     @GetMapping("/homepage")
-    public ResponseEntity<List<PostResponseDTO>> getHomepage(
-        @RequestParam(name = "category") PostCategory category) {
-
-        System.out.println(category);
-
+    public ResponseEntity<List<PostResponseDTO>> getHomepage(@RequestParam(name = "category") PostCategory category) {
         return ResponseEntity.ok(userService.getHomepage(category));
     }
 }
