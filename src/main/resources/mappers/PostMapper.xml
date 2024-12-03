@@ -2,12 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.tilon.ojt_back.dao.management.PostMapper">
+<mapper namespace="com.tilon.ojt_back.dao.manage.PostMapper">
 
     <!-- post 조회 --> 
     <select id="getPostRow"
-            parameterType="com.tilon.ojt_back.domain.management.PostCategory"
-            resultType="com.tilon.ojt_back.domain.management.PostResponseDTO">
+            parameterType="com.tilon.ojt_back.domain.manage.PostCategory"
+            resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
         SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, fix, link, image_url
         FROM post
         WHERE category = #{category}
@@ -17,14 +17,14 @@
 
     <!-- post 작성 -->
     <insert id="createPostRow"
-            parameterType="com.tilon.ojt_back.domain.management.PostRequestDTO">
+            parameterType="com.tilon.ojt_back.domain.manage.PostRequestDTO">
         INSERT INTO post (title, content, category, admin_id, status, fix, link, image_url)
         VALUES (#{title}, #{content}, #{category}, #{admin_id}, #{status}, #{fix}, #{link}, #{image_url});
     </insert>
 
     <!-- post 수정 -->
     <update id="updatePostRow"
-            parameterType="com.tilon.ojt_back.domain.management.PostRequestDTO">
+            parameterType="com.tilon.ojt_back.domain.manage.PostRequestDTO">
         UPDATE post
         SET title = #{title}, content = #{content}, status = #{status}, fix = #{fix}, link = #{link}, image_url = #{image_url}
         WHERE post_id = #{post_id};

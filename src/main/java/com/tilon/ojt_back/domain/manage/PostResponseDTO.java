@@ -1,4 +1,4 @@
-package com.tilon.ojt_back.domain.management;
+package com.tilon.ojt_back.domain.manage;
 
 import java.time.LocalDateTime;
 
