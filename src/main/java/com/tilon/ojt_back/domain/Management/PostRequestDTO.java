@@ -13,6 +13,7 @@ public class PostRequestDTO {
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
     private PostStatus status;
+    private PostFix fix;
     private String link;
     private String image_url;
 }
