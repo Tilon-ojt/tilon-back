@@ -28,21 +28,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 요청 �
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String requestURI = request.getRequestURI();
+        logger.info("Incoming request URI: {}", requestURI); // 요청 URI 로그 추가
 
-        // SecurityConfig에서 허용된 경로는 필터를 통과하도록 설정
+        // /list 경로에 대한 필터 통과 설정
         if (requestURI.startsWith("/v2/api-docs") ||
                 requestURI.startsWith("/swagger-ui/") ||
                 requestURI.startsWith("/swagger-resources/") ||
                 requestURI.startsWith("/user/") ||
-                requestURI.startsWith("/static/")) { // 정적 리소스 경로 필터 통과
-            filterChain.doFilter(request, response); // 다음 필터로 요청 전달
-            return; // 필터 체인 진행 중단
+                requestURI.startsWith("/static/")) {
+            logger.info("Request URI {} is allowed without authentication", requestURI); // 인증 없이 허용되는 경로 로그 추가
+            filterChain.doFilter(request, response);
+            return;
         }
 
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        logger.info("Authorization header: {}", authorizationHeader); // Authorization 헤더 로그 추가
 
         // Authorization 헤더가 없거나 Bearer로 시작하지 않는 경우
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            logger.warn("Authorization header is missing or invalid for URI: {}", requestURI); // 경고 로그 추가
             errorResponse(response); // 오류 응답 호출
             return; // 필터 체인 진행 중단
         }
@@ -71,15 +75,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 요청 �
         }
 
         // Access Token인 경우 처리
-        CustomUserDetails userDetails = jwtTokenProvider.getUserDetailsFromToken(token); // CustomUserDetails 추출
+        CustomUserDetails userDetails = jwtTokenProvider.getUserDetailsFromToken(token);
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities() // 인증 토큰 생성
-        );
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); // 요청 세부 정보 설정
+                userDetails, null, userDetails.getAuthorities());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken); // 인증 토큰 설정
-        filterChain.doFilter(request, response); // 다음 필터로 요청 전달
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        // 디버깅: 인증 정보 출력
+        logger.info("Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
+
+        filterChain.doFilter(request, response);
 
         logger.info("Processing request for URI: {}", requestURI);
     }
@@ -89,6 +96,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 요청 �
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 상태 코드 설정
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"message\": \"" + "인증 실패" + "\"}");
+        response.getWriter().write("{\"message\": \"" + "인증 실패(토큰 자체 이슈)" + "\"}");
     }
 }
