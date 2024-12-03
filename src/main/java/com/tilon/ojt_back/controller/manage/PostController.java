@@ -22,27 +22,27 @@ import com.tilon.ojt_back.service.manage.PostService;
 
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/post")
 public class PostController {
     @Autowired
     private PostService postService;
 
     // post 조회
-    @GetMapping("/post")
+    @GetMapping("")
     public ResponseEntity<List<PostResponseDTO>> getPost(
         @RequestParam(name = "category") PostCategory category){
         return ResponseEntity.ok(postService.getPost(category));
     }
 
     // post 작성
-    @PostMapping("/post")
+    @PostMapping("")
     public ResponseEntity<Void> createPost(@RequestBody PostRequestDTO param) {
         postService.createPost(param);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // post 수정
-    @PutMapping("/post/{postId}")
+    @PutMapping("/{postId}")
     public ResponseEntity<Void> updatePost(
         @PathVariable(name = "postId") int post_id,
         @RequestBody PostRequestDTO param) {
@@ -51,8 +51,14 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    // post status 수정
+    // @PatchMapping("/{postId}/status")
+
+    // post fix 수정
+
+
     // post 삭제
-    @DeleteMapping("/post/{postId}")
+    @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable(name = "postId") int post_id) {
         postService.deletePost(post_id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

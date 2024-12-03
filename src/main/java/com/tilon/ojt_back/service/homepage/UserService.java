@@ -18,10 +18,12 @@ public class UserService {
     private UserMapper userMapper;
 
     // user의 post 조회
-    public List<PostResponseDTO> getPostRow(PostCategory category, PostStatus status) {
-        Map<String, Object> param = new HashMap<>();
-        param.put("category", category);
-        param.put("status", status);
-        return userMapper.getPostRow(param);
+    public List<PostResponseDTO> getPost(PostCategory category) {
+        return userMapper.getPostRow(category);
+    }
+
+    // user의 homepage 조회
+    public List<PostResponseDTO> getHomepage(PostCategory category) {
+        return userMapper.getHomepage(category);
     }
 }
