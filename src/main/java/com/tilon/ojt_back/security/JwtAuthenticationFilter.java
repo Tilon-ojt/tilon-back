@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 요청 �
                 requestURI.startsWith("/swagger-ui/") ||
                 requestURI.startsWith("/swagger-resources/") ||
                 requestURI.startsWith("/user/") ||
+                //requestURI.startsWith("/admin/") ||
                 requestURI.startsWith("/static/")) {
             logger.info("Request URI {} is allowed without authentication", requestURI); // 인증 없이 허용되는 경로 로그 추가
             filterChain.doFilter(request, response);

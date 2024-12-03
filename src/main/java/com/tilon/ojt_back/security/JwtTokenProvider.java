@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Component
 public class JwtTokenProvider {
@@ -42,22 +44,22 @@ public class JwtTokenProvider {
     private String createToken(CustomUserDetails userDetails, long expireTimeMs,
             String tokenType) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("adminId", userDetails.getAdminId()); // 어드민 id를 클레임에 추가
-        claims.put("empno", userDetails.getEmpno()); // empno를 클레임에 추가
-        claims.put("tokenType", tokenType); // 토큰 타입을 클레임에 추가
+        claims.put("adminId", userDetails.getAdminId());
+        claims.put("empno", userDetails.getEmpno());
+        claims.put("role", userDetails.getRole());
+        claims.put("tokenType", tokenType);
 
-        logger.info("Creating token with claims: {}", claims); // 클레임 로그 추가
+        logger.info("Creating token with claims: {}", claims);
 
-        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)); // 키 생성
+        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
-                .setClaims(claims) // 클레임 설정
-                .setSubject(String.valueOf(userDetails.getAdminId())) // adminId를 주제로 설정
-                .setIssuedAt(new Date(System.currentTimeMillis())) // 발행일자 설정
-                .setExpiration(new Date(System.currentTimeMillis() + expireTimeMs)) // 토큰 만료
-                // 시간 설정
-                .signWith(key, SignatureAlgorithm.HS256) // 키, 알고리즘 설정 (서명)
-                .compact(); // 토큰 생성
+                .setClaims(claims)
+                .setSubject(String.valueOf(userDetails.getAdminId()))
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expireTimeMs))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     // CustomUserDetails에서 adminId와 empno 꺼내기
@@ -67,7 +69,12 @@ public class JwtTokenProvider {
         String empno = claims.get("empno", String.class);
         String role = claims.get("role", String.class);
 
-        return new CustomUserDetails(adminId, empno, "defaultAdminName", "password", new ArrayList<>(), role);
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        if (role != null && !role.isEmpty()) {
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
+
+        return new CustomUserDetails(adminId, empno, "defaultAdminName", "password", authorities, role);
     }
 
     // 토큰 만료 여부 확인
