@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tilon.ojt_back.dao.homepage.UserMapper">
+    <!-- user의 post 조회 --> 
+    <select id="getPostRow"
+            parameterType="Map"
+            resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
+        SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, fix, link, image_url
+        FROM post
+        WHERE category = #{category} AND status = #{status}
+        ORDER BY created_at DESC
+        LIMIT 3;
+    </select>
+</mapper>
