@@ -1,4 +1,4 @@
-package com.tilon.ojt_back.controller.Management;
+package com.tilon.ojt_back.controller.management;
 
 import java.util.List;
 
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tilon.ojt_back.domain.Management.PostCategory;
-import com.tilon.ojt_back.domain.Management.PostRequestDTO;
-import com.tilon.ojt_back.domain.Management.PostResponseDTO;
-import com.tilon.ojt_back.service.Management.PostService;
+import com.tilon.ojt_back.domain.management.PostCategory;
+import com.tilon.ojt_back.domain.management.PostRequestDTO;
+import com.tilon.ojt_back.domain.management.PostResponseDTO;
+import com.tilon.ojt_back.service.management.PostService;
 
 
 @RestController

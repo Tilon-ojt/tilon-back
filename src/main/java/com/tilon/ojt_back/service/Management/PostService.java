@@ -1,14 +1,14 @@
-package com.tilon.ojt_back.service.Management;
+package com.tilon.ojt_back.service.management;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.tilon.ojt_back.dao.Management.PostMapper;
-import com.tilon.ojt_back.domain.Management.PostCategory;
-import com.tilon.ojt_back.domain.Management.PostRequestDTO;
-import com.tilon.ojt_back.domain.Management.PostResponseDTO;
+import com.tilon.ojt_back.dao.management.PostMapper;
+import com.tilon.ojt_back.domain.management.PostCategory;
+import com.tilon.ojt_back.domain.management.PostRequestDTO;
+import com.tilon.ojt_back.domain.management.PostResponseDTO;
 
 @Service
 public class PostService {
