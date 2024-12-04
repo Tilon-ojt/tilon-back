@@ -35,7 +35,7 @@ public class AdminController {
     private JwtTokenProvider jwtTokenProvider;
 
     // 어드민 목록 조회
-    @GetMapping("/admin/list")
+    @GetMapping("/admin/account/list")
     public List<AdminResponseDTO> getAdminList() {
         logger.info("Admin list request received");
         List<AdminResponseDTO> adminList = adminService.getAdminList();
@@ -44,7 +44,7 @@ public class AdminController {
     }
 
     // 어드민 등록
-    @PostMapping("/admin/register")
+    @PostMapping("/admin/account/register")
     public ResponseEntity<Map<String, Object>> registerAdmin(@RequestBody AdminRequestDTO adminRequestDTO) {
         logger.info("Admin register request received: {}", adminRequestDTO);
         try {

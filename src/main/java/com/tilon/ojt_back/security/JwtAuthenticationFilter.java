@@ -73,6 +73,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 요청된 엔드포인트에 필요한 역할을 사용자가 가지고 있는지 확인
+        if (requestURI.startsWith("/admin/account/") && 
+            userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+            logger.warn("SUPER_ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
+            errorResponse(response, "SUPER_ADMIN 권한이 필요합니다.");
+            return;
+        }
+
+        if (requestURI.startsWith("/admin/post/") && 
+            userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN") || auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+            logger.warn("ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
+            errorResponse(response, "ADMIN 권한이 필요합니다.");
+            return;
+        }
+
+        // 로그아웃 요청은 특별한 역할 검증 없이 인증된 사용자라면 허용
+        if (requestURI.equals("/admin/logout")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 인증 토큰 생성 : 사용자 정보와 권한을 포함하고 있는 객체 생성(이 객체는 시큐리티 인증 매커니즘에 사용된다더라)
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
