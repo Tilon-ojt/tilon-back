@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostResponseDTO;
-import com.tilon.ojt_back.domain.manage.PostStatus;
 import com.tilon.ojt_back.service.homepage.UserService;
 
 @RestController
