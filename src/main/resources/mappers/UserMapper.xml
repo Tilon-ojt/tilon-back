@@ -4,7 +4,7 @@
 
 <mapper namespace="com.tilon.ojt_back.dao.homepage.UserMapper">
     <!-- user의 post 조회 --> 
-    <select id="getPostRow"
+    <select id="getPostsRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostCategory"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
         SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, fix, link, image_url

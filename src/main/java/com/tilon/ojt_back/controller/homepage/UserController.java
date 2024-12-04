@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostResponseDTO;
-import com.tilon.ojt_back.domain.manage.PostStatus;
 import com.tilon.ojt_back.service.homepage.UserService;
 
 @RestController
@@ -22,8 +21,8 @@ public class UserController {
 
     // user의 post 조회
     @GetMapping("/post")
-    public ResponseEntity<List<PostResponseDTO>> getPost(@RequestParam(name = "category") PostCategory category) {
-        return ResponseEntity.ok(userService.getPost(category));
+    public ResponseEntity<List<PostResponseDTO>> getPosts(@RequestParam(name = "category") PostCategory category) {
+        return ResponseEntity.ok(userService.getPosts(category));
     }
 
     // user의 homepage 조회

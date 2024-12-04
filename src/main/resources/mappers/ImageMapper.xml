@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tilon.ojt_back.dao.ImageMapper">
+
+    <!-- 파일 이름 저장 -->
+    <insert id="saveImageNameToDBRow"
+            parameterType="Map">
+        UPDATE post
+        SET image_url = #{image_url}
+        WHERE post_id = #{post_id};
+    </insert>
+
+    <!-- 이미지 이름 가져오기 -->
+    <select id="getImageNames"
+            parameterType="int"
+            resultType="List<String>">
+        SELECT image_url
+        FROM post
+        WHERE post_id = #{post_id};
+    </select>
+</mapper>
