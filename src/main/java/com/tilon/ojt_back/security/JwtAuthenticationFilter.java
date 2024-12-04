@@ -28,10 +28,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        logger.info("Incoming request URI: {}", requestURI);
+        logger.info("들어오는 요청 URI: {}", requestURI);
 
+        // /admin/ 경로 제외하고 모든 요청을 허용해 필터 체인 진행
         if (!requestURI.startsWith("/admin/")) {
-            logger.info("Request URI {} is allowed without authentication", requestURI);
+            logger.info("{} 요청은 인증 없이 허용됌!", requestURI);
             filterChain.doFilter(request, response);
             return;
         }
@@ -39,14 +40,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         logger.info("Authorization header: {}", authorizationHeader);
 
+        // AuthorizationHeader가 없거나 Bearer로 시작하지 않는 경우
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            logger.warn("Authorization header is missing or invalid for URI: {}", requestURI);
+            logger.warn("Authorization 헤더가 없거나 Bearer로 시작하지 않음! : {}", requestURI);
             errorResponse(response);
             return;
         }
 
+        // Bearer 이후의 토큰 추출
         String token = authorizationHeader.split(" ")[1];
 
+        // Access 토큰이 아니거나 만료된 경우
         try {
             if (!jwtTokenProvider.isAccessToken(token) || jwtTokenProvider.isExpired(token)) {
                 errorResponse(response);
@@ -57,25 +61,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        // jwtTokenProvider를 사용해 토큰에서 사용자 정보 추출 : 정보 인증을 위해 사용
         CustomUserDetails userDetails = jwtTokenProvider.getUserDetailsFromToken(token);
 
+        // 추가된 코드: ADMIN 역할이지만 SUPER_ADMIN이 아닌 경우 예외 처리
+        if (userDetails.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")) &&
+                userDetails.getAuthorities().stream()
+                        .noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+            logger.warn("ADMIN 역할이지만 SUPER_ADMIN이 아님: {}", requestURI);
+            errorResponse(response, "SUPER_ADMIN 권한이 필요합니다.");
+            return;
+        }
+
+        // 인증 토큰 생성 : 사용자 정보와 권한을 포함하고 있는 객체 생성(이 객체는 시큐리티 인증 매커니즘에 사용된다더라)
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); // 인증토큰에 요청에 대한 세부정보
+                                                                                                    // 설정(추가 정보 제공위함)
 
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken); // 인증 토큰을 시큐리티 컨테스트에 저장 -> 이후 요청 처리에서
+                                                                                   // 인증된 사용자 정보 사용
 
-        logger.info("Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
+        logger.info("Authentication 인증 정보 로깅 : {}", SecurityContextHolder.getContext().getAuthentication());
 
+        // 다음 필터 요청 전달 (필터체인 진행 )
         filterChain.doFilter(request, response);
 
-        logger.info("Processing request for URI: {}", requestURI);
+        logger.info("처리중인  for URI: {}", requestURI);
     }
 
     private void errorResponse(HttpServletResponse response) throws IOException {
+        errorResponse(response, "인증 정보가 필요합니다.");
+    }
+
+    private void errorResponse(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"message\": \"" + "인증 실패(토큰 자체 이슈)" + "\"}");
+        response.getWriter().write("{\"message\": \"" + message + "\"}");
     }
 }

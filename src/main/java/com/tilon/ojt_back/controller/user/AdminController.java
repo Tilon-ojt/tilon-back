@@ -22,6 +22,7 @@ import com.tilon.ojt_back.service.user.AdminService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @RestController
 public class AdminController {
@@ -33,6 +34,7 @@ public class AdminController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    // 어드민 목록 조회
     @GetMapping("/admin/list")
     public List<AdminResponseDTO> getAdminList() {
         logger.info("Admin list request received");
@@ -41,6 +43,7 @@ public class AdminController {
         return adminList;
     }
 
+    // 어드민 등록
     @PostMapping("/admin/register")
     public ResponseEntity<Map<String, Object>> registerAdmin(@RequestBody AdminRequestDTO adminRequestDTO) {
         logger.info("Admin register request received: {}", adminRequestDTO);
@@ -56,6 +59,7 @@ public class AdminController {
         }
     }
 
+    // 어드민 로그인
     @PostMapping("/user/login")
     public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginDTO loginDTO) {
         try {
@@ -68,6 +72,32 @@ public class AdminController {
             System.err.println("로그인 중 오류 발생: " + e.getMessage());
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("message", "로그인 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    // 어드민 로그아웃
+    @PostMapping("/admin/logout")
+    public ResponseEntity<Map<String, Object>> logoutAdmin(@RequestHeader("Authorization") String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "유효한 토큰이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
+        logger.info("Admin logout request received for token: {}", token);
+        try {
+            jwtTokenProvider.invalidateToken(token);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "성공적으로 로그아웃되었습니다.");
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error during admin logout: {}", e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "로그아웃 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }

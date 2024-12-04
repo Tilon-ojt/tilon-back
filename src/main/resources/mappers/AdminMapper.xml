@@ -38,8 +38,8 @@
 
     <!-- 3. 사용자 추가 -->
     <insert id="insertAdmin" parameterType="com.tilon.ojt_back.domain.user.AdminRequestDTO">
-        INSERT INTO admin (empno, password, admin_name)
-        VALUES (#{empno}, #{password}, #{adminName})
+        INSERT INTO admin (empno, password, admin_name, email)
+        VALUES (#{empno}, #{password}, #{adminName}, #{email})
     </insert>
 
     <!-- 사용자 추가 후 존재 여부 검증 -->
