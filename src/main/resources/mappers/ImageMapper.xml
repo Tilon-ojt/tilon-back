@@ -15,7 +15,7 @@
     <!-- 이미지 이름 가져오기 -->
     <select id="getImageNames"
             parameterType="int"
-            resultType="List<String>">
+            resultType="String">
         SELECT image_url
         FROM post
         WHERE post_id = #{postId};
