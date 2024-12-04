@@ -10,7 +10,7 @@ import com.tilon.ojt_back.domain.manage.PostResponseDTO;
 @Mapper
 public interface UserMapper {
     // user의 post 조회
-    List<PostResponseDTO> getPostRow(PostCategory category);
+    List<PostResponseDTO> getPostsRow(PostCategory category);
 
     // user의 homepage 조회
     List<PostResponseDTO> getHomepage(PostCategory category);

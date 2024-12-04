@@ -20,5 +20,5 @@ public class PostResponseDTO {
     private PostStatus status;
     private PostFix fix;
     private String link;
-    private String image_url;
+    private String imageUrl;
 }

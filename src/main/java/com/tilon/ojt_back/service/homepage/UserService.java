@@ -14,9 +14,9 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    // user의 post 조회
-    public List<PostResponseDTO> getPost(PostCategory category) {
-        return userMapper.getPostRow(category);
+    // user의 posts 조회
+    public List<PostResponseDTO> getPosts(PostCategory category) {
+        return userMapper.getPostsRow(category);
     }
 
     // user의 homepage 조회
