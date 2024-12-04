@@ -59,11 +59,10 @@ public class PostController {
     @PatchMapping("/{postId}/status")
     public ResponseEntity<String> updatePostStatus(
         @PathVariable(name = "postId") int post_id,
-        @RequestParam(name = "status") PostStatus status,
-        @RequestParam(name = "fix") PostFix fix) {
+        @RequestParam(name = "status") PostStatus status) {
 
         try {
-            postService.updatePostStatus(post_id, status, fix);
+            postService.updatePostStatus(post_id, status);
             return ResponseEntity.noContent().build();
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
@@ -74,11 +73,10 @@ public class PostController {
     @PatchMapping("/{postId}/fix")
     public ResponseEntity<String> updatePostFix(
         @PathVariable(name = "postId") int post_id,
-        @RequestParam(name = "status") PostStatus status,
         @RequestParam(name = "fix") PostFix fix) {
 
         try {
-            postService.updatePostFix(post_id, status, fix);
+            postService.updatePostFix(post_id, fix);
             return ResponseEntity.noContent().build();
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());

@@ -38,6 +38,15 @@
         WHERE post_id = #{post_id};
     </update>
 
+    <!-- post fix 조회 --> 
+    <select id="getPostFixRow"
+            parameterType="int"
+            resultType="com.tilon.ojt_back.domain.manage.PostFix">
+        SELECT fix
+        FROM post
+        WHERE post_id = #{post_id};
+    </select>
+
     <!-- post fix 수정 --> 
     <update id="updatePostFixRow"
             parameterType="java.util.Map">
@@ -45,6 +54,15 @@
         SET fix = #{fix}
         WHERE post_id = #{post_id};
     </update>
+
+    <!-- post status 조회 --> 
+    <select id="getPostStatusRow"
+            parameterType="int"
+            resultType="com.tilon.ojt_back.domain.manage.PostStatus">
+        SELECT status
+        FROM post
+        WHERE post_id = #{post_id};
+    </select>
 
     <!-- post 삭제 --> 
     <delete id="deletePostRow"

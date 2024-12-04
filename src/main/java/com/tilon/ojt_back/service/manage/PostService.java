@@ -37,8 +37,12 @@ public class PostService {
     }
 
     // post status 수정
-    public void updatePostStatus(int post_id, PostStatus status, PostFix fix) {
-        if (status == PostStatus.DRAFT && fix == PostFix.FIX) {
+    public void updatePostStatus(int post_id, PostStatus status) {
+
+        PostStatus presentStatus = postMapper.getPostStatusRow(post_id);
+        PostFix presentFix = postMapper.getPostFixRow(post_id);
+
+        if (PostStatus.DRAFT == presentStatus && PostFix.FIX == presentFix) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "게시되어 있지 않지만 고정되어 있는 게시물입니다.");
         }
         
@@ -46,16 +50,20 @@ public class PostService {
         param.put("post_id", post_id);
         param.put("status", status);
 
-        if(fix == PostFix.NOT_FIX){
+        if(presentFix == PostFix.NOT_FIX){
             postMapper.updatePostStatusRow(param);
-        } else if(fix == PostFix.FIX){
+        } else if(presentFix == PostFix.FIX){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "고정 게시글은 상태 변경이 불가능합니다.");
         }
     }
 
     // post fix 수정
-    public void updatePostFix(int post_id, PostStatus status, PostFix fix) {
-        if (status == PostStatus.DRAFT && fix == PostFix.FIX) {
+    public void updatePostFix(int post_id, PostFix fix) {
+
+        PostStatus presentStatus = postMapper.getPostStatusRow(post_id);
+        PostFix presentFix = postMapper.getPostFixRow(post_id);
+
+        if (PostStatus.DRAFT == presentStatus && PostFix.FIX == presentFix) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "게시되어 있지 않지만 고정되어 있는 게시물입니다.");
         }
 
@@ -63,9 +71,9 @@ public class PostService {
         param.put("post_id", post_id);
         param.put("fix", fix);
 
-        if(status == PostStatus.PUBLISHED){
+        if(presentStatus == PostStatus.PUBLISHED){
             postMapper.updatePostFixRow(param);
-        } else if(status == PostStatus.DRAFT){
+        } else if(presentStatus == PostStatus.DRAFT){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "게시글이 게시되어 있을 때만 고정 가능합니다.");
         }
     }
