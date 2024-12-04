@@ -41,12 +41,11 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
                 .authorizeHttpRequests(requests -> {
                     requests
-                            .requestMatchers("/v2/api-docs", "/swagger-ui/**", "/swagger-resources/**").permitAll() // Swagger
-                            .requestMatchers("/user/**").permitAll() // /user/** 경로는 인증 없이 접근 허용
+                            .requestMatchers("/v3/api-docs", "/swagger-ui/**", "/swagger-resources/**").permitAll() // Swagger
+                            .requestMatchers("/admin/post/**").hasAnyRole("SUPER_ADMIN", "ADMIN") // ADMIN과 SUPER_ADMIN
                             .requestMatchers("/admin/**").hasRole("SUPER_ADMIN") // SUPER_ADMIN만 접근 가능
-                            //.requestMatchers("/admin/**").permitAll() // SUPER_ADMIN만 접근 가능
                             .requestMatchers("/static/**").permitAll() // 정적 리소스 접근 허용
-                            .anyRequest().authenticated(); // 나머지 요청은 인증 필요
+                            .anyRequest().permitAll(); // 나머지 요청은 허용
                     logger.info("Security configuration applied"); // 보안 설정 로그 추가
                 })
                 .build();
