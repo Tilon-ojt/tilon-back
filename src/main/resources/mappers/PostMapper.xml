@@ -8,7 +8,7 @@
     <select id="getPostsRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostCategory"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
-        SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, fix, link, image_url
+        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link, image_url as imageUrl
         FROM post
         WHERE category = #{category}
         ORDER BY created_at DESC;
@@ -18,7 +18,7 @@
     <select id="getPostRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostCategory"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
-        SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, fix, link, image_url
+        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link, image_url as imageUrl
         FROM post
         WHERE post_id = #{postId};
     </select>
@@ -26,7 +26,7 @@
     <!-- post 작성 -->
     <insert id="createPostRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostRequestDTO">
-        INSERT INTO post (title, content, category, admin_id, status, fix, link, image_url)
+        INSERT INTO post (title, content, category, admin_id as adminId, status, fix, link, image_url as imageUrl)
         VALUES (#{title}, #{content}, #{category}, #{adminId}, #{status}, #{fix}, #{link}, #{imageUrl});
     </insert>
 
