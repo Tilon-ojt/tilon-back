@@ -16,7 +16,7 @@ import com.tilon.ojt_back.dao.user.AdminMapper;
 import com.tilon.ojt_back.domain.CustomUserDetails;
 import com.tilon.ojt_back.domain.user.AdminRequestDTO;
 import com.tilon.ojt_back.domain.user.AdminResponseDTO;
-import com.tilon.ojt_back.domain.user.oginDTO;
+import com.tilon.ojt_back.domain.user.LoginDTO;
 import com.tilon.ojt_back.security.JwtTokenProvider;
 
 @Service
@@ -37,7 +37,7 @@ public class AdminService {
     }
 
     // 2. 어드민 로그인
-    public ResponseEntity<Map<String, Object>> login(oginDTO loginDTO) {
+    public ResponseEntity<Map<String, Object>> login(LoginDTO loginDTO) {
         try {
             // 로그 추가: 로그인 시도
             System.out.println("로그인 시도: " + loginDTO.getEmpno());

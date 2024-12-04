@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tilon.ojt_back.domain.user.AdminRequestDTO;
 import com.tilon.ojt_back.domain.user.AdminResponseDTO;
-import com.tilon.ojt_back.domain.user.oginDTO;
+import com.tilon.ojt_back.domain.user.LoginDTO;
 import com.tilon.ojt_back.security.JwtTokenProvider;
 import com.tilon.ojt_back.service.user.AdminService;
 
@@ -57,7 +57,7 @@ public class AdminController {
     }
 
     @PostMapping("/user/login")
-    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody oginDTO loginDTO) {
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginDTO loginDTO) {
         try {
             // 로그인 메서드 호출
             ResponseEntity<Map<String, Object>> responseEntity = adminService.login(loginDTO);
