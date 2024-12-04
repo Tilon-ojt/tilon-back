@@ -26,14 +26,14 @@ public interface PostMapper {
     public void updatePostStatusRow(Map<String, Object> param);
 
     // post fix 조회
-    public PostFix getPostFixRow(int post_id);
+    public PostFix getPostFixRow(int postId);
 
     // post fix 수정
     public void updatePostFixRow(Map<String, Object> param);
 
     // post status 조회
-    public PostStatus getPostStatusRow(int post_id);
+    public PostStatus getPostStatusRow(int postId);
 
     // post 삭제
-    public void deletePostRow(int post_id);
+    public void deletePostRow(int postId);
 }

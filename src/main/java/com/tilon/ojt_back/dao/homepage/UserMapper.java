@@ -12,6 +12,9 @@ public interface UserMapper {
     // user의 post 조회
     List<PostResponseDTO> getPostsRow(PostCategory category);
 
+    // user의 post 상세 조회
+    PostResponseDTO getPostRow(int postId);
+
     // user의 homepage 조회
     List<PostResponseDTO> getHomepage(PostCategory category);
 }

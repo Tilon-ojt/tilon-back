@@ -5,13 +5,13 @@ import java.time.LocalDateTime;
 import lombok.Data;
 @Data
 public class PostRequestDTO {
-    private int post_id;
+    private int postId;
     private String title;
     private String content;
     private PostCategory category;
-    private int admin_id;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
+    private int adminId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private PostStatus status;
     private PostFix fix;
     private String link;

@@ -48,21 +48,21 @@ public class PostController {
     // post 수정
     @PutMapping("/{postId}")
     public ResponseEntity<Void> updatePost(
-        @PathVariable(name = "postId") int post_id,
+        @PathVariable(name = "postId") int postId,
         @RequestBody PostRequestDTO param) {
 
-        postService.updatePost(post_id, param);
+        postService.updatePost(postId, param);
         return ResponseEntity.noContent().build();
     }
 
     // post status 수정
     @PatchMapping("/{postId}/status")
     public ResponseEntity<String> updatePostStatus(
-        @PathVariable(name = "postId") int post_id,
+        @PathVariable(name = "postId") int postId,
         @RequestParam(name = "status") PostStatus status) {
 
         try {
-            postService.updatePostStatus(post_id, status);
+            postService.updatePostStatus(postId, status);
             return ResponseEntity.noContent().build();
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
@@ -72,11 +72,11 @@ public class PostController {
     // post fix 수정
     @PatchMapping("/{postId}/fix")
     public ResponseEntity<String> updatePostFix(
-        @PathVariable(name = "postId") int post_id,
+        @PathVariable(name = "postId") int postId,
         @RequestParam(name = "fix") PostFix fix) {
 
         try {
-            postService.updatePostFix(post_id, fix);
+            postService.updatePostFix(postId, fix);
             return ResponseEntity.noContent().build();
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
@@ -85,8 +85,8 @@ public class PostController {
 
     // post 삭제
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable(name = "postId") int post_id) {
-        postService.deletePost(post_id);
+    public ResponseEntity<Void> deletePost(@PathVariable(name = "postId") int postId) {
+        postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
 }

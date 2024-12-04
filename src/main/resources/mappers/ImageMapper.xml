@@ -8,8 +8,8 @@
     <insert id="saveImageNameToDBRow"
             parameterType="Map">
         UPDATE post
-        SET image_url = #{image_url}
-        WHERE post_id = #{post_id};
+        SET image_url = #{imageUrl}
+        WHERE post_id = #{postId};
     </insert>
 
     <!-- 이미지 이름 가져오기 -->
@@ -18,6 +18,6 @@
             resultType="List<String>">
         SELECT image_url
         FROM post
-        WHERE post_id = #{post_id};
+        WHERE post_id = #{postId};
     </select>
 </mapper>
