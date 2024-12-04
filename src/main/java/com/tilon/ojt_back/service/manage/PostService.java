@@ -31,23 +31,23 @@ public class PostService {
     }
 
     // post 수정
-    public void updatePost(int post_id, PostRequestDTO param) {
-        param.setPost_id(post_id);
+    public void updatePost(int postId, PostRequestDTO param) {
+        param.setPostId(postId);
         postMapper.updatePostRow(param);
     }
 
     // post status 수정
-    public void updatePostStatus(int post_id, PostStatus status) {
+    public void updatePostStatus(int postId, PostStatus status) {
 
-        PostStatus presentStatus = postMapper.getPostStatusRow(post_id);
-        PostFix presentFix = postMapper.getPostFixRow(post_id);
+        PostStatus presentStatus = postMapper.getPostStatusRow(postId);
+        PostFix presentFix = postMapper.getPostFixRow(postId);
 
         if (PostStatus.DRAFT == presentStatus && PostFix.FIX == presentFix) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "게시되어 있지 않지만 고정되어 있는 게시물입니다.");
         }
         
         Map<String, Object> param = new HashMap<>();
-        param.put("post_id", post_id);
+        param.put("postId", postId);
         param.put("status", status);
 
         if(presentFix == PostFix.NOT_FIX){
@@ -58,17 +58,17 @@ public class PostService {
     }
 
     // post fix 수정
-    public void updatePostFix(int post_id, PostFix fix) {
+    public void updatePostFix(int postId, PostFix fix) {
 
-        PostStatus presentStatus = postMapper.getPostStatusRow(post_id);
-        PostFix presentFix = postMapper.getPostFixRow(post_id);
+        PostStatus presentStatus = postMapper.getPostStatusRow(postId);
+        PostFix presentFix = postMapper.getPostFixRow(postId);
 
         if (PostStatus.DRAFT == presentStatus && PostFix.FIX == presentFix) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "게시되어 있지 않지만 고정되어 있는 게시물입니다.");
         }
 
         Map<String, Object> param = new HashMap<>();
-        param.put("post_id", post_id);
+        param.put("postId", postId);
         param.put("fix", fix);
 
         if(presentStatus == PostStatus.PUBLISHED){
@@ -79,7 +79,7 @@ public class PostService {
     }
 
     // post 삭제
-    public void deletePost(int post_id) {
-        postMapper.deletePostRow(post_id);
+    public void deletePost(int postId) {
+        postMapper.deletePostRow(postId);
     }
 }

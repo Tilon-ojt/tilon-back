@@ -13,6 +13,15 @@
         ORDER BY created_at DESC;
     </select>
 
+    <!-- user의 post 상세 조회 -->
+    <select id="getPostRow"
+            parameterType="int"
+            resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
+        SELECT post_id, title, content, category, admin_id, created_at, updated_at, status, fix, link, image_url
+        FROM post
+        WHERE post_id = #{postId} AND status = 'PUBLISHED';
+    </select>
+
     <!-- user의 homepage 조회 --> 
     <select id="getHomepage"
             parameterType="com.tilon.ojt_back.domain.manage.PostCategory"

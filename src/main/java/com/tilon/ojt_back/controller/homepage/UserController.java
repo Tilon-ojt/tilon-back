@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,12 @@ public class UserController {
     @GetMapping("/post")
     public ResponseEntity<List<PostResponseDTO>> getPosts(@RequestParam(name = "category") PostCategory category) {
         return ResponseEntity.ok(userService.getPosts(category));
+    }
+
+    // user의 post 상세 조회
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO> getPost(@PathVariable int postId) {
+        return ResponseEntity.ok(userService.getPost(postId));
     }
 
     // user의 homepage 조회
