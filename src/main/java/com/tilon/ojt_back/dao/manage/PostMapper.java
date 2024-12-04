@@ -14,7 +14,10 @@ import com.tilon.ojt_back.domain.manage.PostStatus;
 @Mapper
 public interface PostMapper {
     // post 조회
-    public List<PostResponseDTO> getPostRow(PostCategory category);
+    public List<PostResponseDTO> getPostsRow(PostCategory category);
+
+    // post 상세 조회
+    public PostResponseDTO getPostRow(int postId);
 
     // post 작성
     public void createPostRow(PostRequestDTO param);

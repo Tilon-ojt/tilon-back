@@ -33,9 +33,15 @@ public class PostController {
 
     // post 조회
     @GetMapping("")
-    public ResponseEntity<List<PostResponseDTO>> getPost(
+    public ResponseEntity<List<PostResponseDTO>> getPosts(
         @RequestParam(name = "category") PostCategory category){
-        return ResponseEntity.ok(postService.getPost(category));
+        return ResponseEntity.ok(postService.getPosts(category));
+    }
+
+    // post 상세 조회
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO> getPost(@PathVariable int postId){
+        return ResponseEntity.ok(postService.getPost(postId));
     }
 
     // post 작성

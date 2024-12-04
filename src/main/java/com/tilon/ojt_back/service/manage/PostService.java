@@ -21,8 +21,13 @@ public class PostService {
     @Autowired private PostMapper postMapper;
 
     // post 조회
-    public List<PostResponseDTO> getPost(PostCategory category) {
-        return postMapper.getPostRow(category);
+    public List<PostResponseDTO> getPosts(PostCategory category) {
+        return postMapper.getPostsRow(category);
+    }
+
+    // post 상세 조회
+    public PostResponseDTO getPost(int postId) {
+        return postMapper.getPostRow(postId);
     }
 
     // post 작성
