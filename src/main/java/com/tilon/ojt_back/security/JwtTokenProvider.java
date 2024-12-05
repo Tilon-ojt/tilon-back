@@ -128,7 +128,7 @@ public class JwtTokenProvider {
         return blacklist.contains(token);
     }
 
-    // 회원탈퇴를 위한 토큰에서 사용자 ID 추출
+    // 토큰에서 사용자 ID 추출
     public int getUserIdFromToken(String token) {
         Claims claims = extractClaims(token);
         logger.info("Extracted claims from token: {}", claims); // 클레임 로그 추가

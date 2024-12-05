@@ -20,6 +20,7 @@ import com.tilon.ojt_back.security.JwtTokenProvider;
 import com.tilon.ojt_back.service.user.AdminService;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -60,14 +61,14 @@ public class AdminController {
         } catch (Exception e) {
             logger.error("Error during admin registration: {}", e.getMessage());
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "어드민 등록 중 오류가 발생했습니다.");
+            errorResponse.put("message", "어드�� 등록 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
     // 계정 비밀번호 초기화 
     @PutMapping("/accounts/{adminId}/reset-password")
-    public ResponseEntity<Map<String, Object>> resetPassword(@PathVariable String adminId) {
+    public ResponseEntity<Map<String, Object>> resetPassword(@PathVariable int adminId) {
         logger.info("비밀번호 리셋할 어드민 아이디: {}", adminId);
         try {
             // 비밀번호 초기화 요청을 서비스에 전달
@@ -93,7 +94,7 @@ public class AdminController {
         }
 
         String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
-        logger.info("Admin logout request received for token: {}", token);
+        logger.info("로그아웃을 요청한 토큰: {}", token);
         try {
             jwtTokenProvider.invalidateToken(token);
 
@@ -109,4 +110,27 @@ public class AdminController {
         }
     }
 
+
+    //3. admin 권한 필요
+    // 비밀번호 변경 
+    @PatchMapping("/password")
+    public ResponseEntity<Map<String, Object>> changePassword(@RequestHeader("Authorization") String authorizationHeader, @RequestBody String password) {
+        String token = authorizationHeader.substring(7); 
+        logger.info("비밀번호 변경 요청을 위한 토큰: {}", token);
+
+        try {
+            int adminId = jwtTokenProvider.getUserIdFromToken(token);
+            logger.info("비밀번호 변경 요청을 위한 토큰 추출 아이디: {}", adminId);
+            logger.info("비밀번호 변경 요청을 위한 새로운 비번: {}", password);
+            return adminService.changePassword(adminId, password);
+        } catch (Exception e) {
+            logger.error("비밀번호 변경 중 오류 발생: {}", e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    
+   
 }

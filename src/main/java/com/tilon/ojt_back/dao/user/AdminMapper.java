@@ -23,6 +23,8 @@ public interface AdminMapper {
     // 사용자 추가 후 존재 여부 검증
     boolean existsByEmpName(String empName);
 
-    //4. 비밀번호 초기화
-    void resetPassword(@Param("adminId") String adminId, @Param("password") String password);
+    //4. 비밀번호 초기화 및 변경
+    void resetPassword(@Param("adminId") int adminId, @Param("password") String password);
+
+ 
 }

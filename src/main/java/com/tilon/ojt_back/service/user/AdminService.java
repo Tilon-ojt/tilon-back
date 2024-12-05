@@ -125,7 +125,7 @@ public class AdminService {
 
     //4. 비밀번호 초기화 
 
-    public ResponseEntity<Map<String, Object>> resetPassword(String adminId) {
+    public ResponseEntity<Map<String, Object>> resetPassword(int adminId) {
         try {
             // 기본 비밀번호를 인코딩
             String encodedPassword = passwordEncoder.encode(DEFAULT_PASSWORD);
@@ -137,7 +137,7 @@ public class AdminService {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "비밀번호가 성공적으로 초기화되었습니다.");
             response.put("adminId", adminId);
-            response.put("encodedPassword", encodedPassword);
+           
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -146,5 +146,24 @@ public class AdminService {
                     .body(Collections.singletonMap("message", "비밀번호 초기화 중 오류가 발생했습니다."));
         }
     }
+    
+    // 5. 비밀번호 변경
+    public ResponseEntity<Map<String, Object>> changePassword(int adminId, String password) {
+        try {
+            // 새 비밀번호를 인코딩
+            String encodedPassword = passwordEncoder.encode(password);
 
+            // 매퍼를 통해 비밀번호 업데이트
+            adminMapper.resetPassword(adminId, encodedPassword);
+
+            // 응답 데이터 구성
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 로그 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "비밀번호 변경 중 오류가 발생했습니다."));
+        }
+    }
 }
