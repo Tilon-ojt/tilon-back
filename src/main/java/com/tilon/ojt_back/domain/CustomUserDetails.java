@@ -9,14 +9,15 @@ public class CustomUserDetails implements UserDetails {
     private int adminId;
     private String empName;
     private String password;
+    private String nickname;
     private Collection<? extends GrantedAuthority> authorities;
     private String role;
 
-    public CustomUserDetails(int adminId, String empName, String password,
+    public CustomUserDetails(int adminId, String empName, String password, String nickname,
             Collection<? extends GrantedAuthority> authorities, String role) {
         this.adminId = adminId;
         this.empName = empName;
-
+        this.nickname = nickname;
         this.password = password;
         this.authorities = authorities; // 사용자 권한 목록 : 세부적인 권한
         this.role = role; // 사용자의 일반적인 역할
@@ -41,8 +42,8 @@ public class CustomUserDetails implements UserDetails {
         return adminId;
     }
 
-    public String getEmpName() {
-        return empName;
+    public String getNickName() {
+        return nickname;
     }
 
     public String getRole() {

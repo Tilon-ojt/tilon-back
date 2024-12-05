@@ -7,21 +7,21 @@ public class AdminResponseDTO {
     private String role; // 역할 (SUPER_ADMIN, ADMIN)
     private String createdAt; // 생성일
     private String updatedAt; // 수정일
-    private String email;
+    private String nickname;
 
     // Constructor
     public AdminResponseDTO() {
     }
 
     public AdminResponseDTO(int adminId, String empName, String password, String role,
-            String createdAt, String updatedAt, String email) {
+            String createdAt, String updatedAt, String nickname) {
         this.adminId = adminId;
         this.empName = empName;
         this.password = password;
         this.role = role;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.email = email;
+        this.nickname = nickname;
     }
 
     // Getters and Setters
@@ -73,11 +73,11 @@ public class AdminResponseDTO {
         this.updatedAt = updatedAt;
     }
 
-    public String getEmail() {
-        return email;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

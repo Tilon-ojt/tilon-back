@@ -13,7 +13,7 @@
             role, 
             created_at AS createdAt, 
             updated_at AS updatedAt, 
-            email
+            nickname
         FROM 
             admin
     </select>
@@ -27,7 +27,7 @@
             role, 
             created_at AS createdAt, 
             updated_at AS updatedAt, 
-            email
+            nickname
         FROM 
             admin
         WHERE 
