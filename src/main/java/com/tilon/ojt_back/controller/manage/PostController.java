@@ -24,7 +24,6 @@ import com.tilon.ojt_back.domain.manage.PostResponseDTO;
 import com.tilon.ojt_back.domain.manage.PostStatus;
 import com.tilon.ojt_back.service.manage.PostService;
 
-
 @RestController
 @RequestMapping("/admin/post")
 public class PostController {
@@ -34,13 +33,13 @@ public class PostController {
     // post 조회
     @GetMapping("")
     public ResponseEntity<List<PostResponseDTO>> getPosts(
-        @RequestParam(name = "category") PostCategory category){
+            @RequestParam(name = "category") PostCategory category) {
         return ResponseEntity.ok(postService.getPosts(category));
     }
 
     // post 상세 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponseDTO> getPost(@PathVariable int postId){
+    public ResponseEntity<PostResponseDTO> getPost(@PathVariable int postId) {
         return ResponseEntity.ok(postService.getPost(postId));
     }
 
@@ -54,8 +53,8 @@ public class PostController {
     // post 수정
     @PutMapping("/{postId}")
     public ResponseEntity<Void> updatePost(
-        @PathVariable(name = "postId") int postId,
-        @RequestBody PostRequestDTO param) {
+            @PathVariable(name = "postId") int postId,
+            @RequestBody PostRequestDTO param) {
 
         postService.updatePost(postId, param);
         return ResponseEntity.noContent().build();
@@ -64,8 +63,8 @@ public class PostController {
     // post status 수정
     @PatchMapping("/{postId}/status")
     public ResponseEntity<String> updatePostStatus(
-        @PathVariable(name = "postId") int postId,
-        @RequestParam(name = "status") PostStatus status) {
+            @PathVariable(name = "postId") int postId,
+            @RequestParam(name = "status") PostStatus status) {
 
         try {
             postService.updatePostStatus(postId, status);
@@ -78,8 +77,8 @@ public class PostController {
     // post fix 수정
     @PatchMapping("/{postId}/fix")
     public ResponseEntity<String> updatePostFix(
-        @PathVariable(name = "postId") int postId,
-        @RequestParam(name = "fix") PostFix fix) {
+            @PathVariable(name = "postId") int postId,
+            @RequestParam(name = "fix") PostFix fix) {
 
         try {
             postService.updatePostFix(postId, fix);
