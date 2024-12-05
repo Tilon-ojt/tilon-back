@@ -25,13 +25,17 @@ public class ImageService {
 
         // 파일 경로 생성
         File filePath = new File(uploadPath, fileName);
+        // 디렉토리가 존재하지 않으면 생성
+        if (!filePath.getParentFile().exists()) {
+            filePath.getParentFile().mkdirs();
+        }
         System.out.println("imageService uploadImage filePath: " + filePath);
 
         // 서버에 파일 저장
         file.transferTo(filePath);
-        
+
         // 파일 경로 반환
-        return serverDomain + "/image/" + fileName;
+        return serverDomain + fileName;
     }
 
     // 이미지 삭제
