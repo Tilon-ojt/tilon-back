@@ -25,7 +25,7 @@ import com.tilon.ojt_back.domain.manage.PostStatus;
 import com.tilon.ojt_back.service.manage.PostService;
 
 @RestController
-@RequestMapping("/admin/post")
+@RequestMapping("/admin/posts")
 public class PostController {
     @Autowired
     private PostService postService;

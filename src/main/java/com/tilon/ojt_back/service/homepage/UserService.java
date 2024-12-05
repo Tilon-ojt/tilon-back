@@ -8,15 +8,11 @@ import org.springframework.stereotype.Service;
 import com.tilon.ojt_back.dao.homepage.UserMapper;
 import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostResponseDTO;
-import com.tilon.ojt_back.service.ImageService;
 
 @Service
 public class UserService {
     @Autowired
     private UserMapper userMapper;
-
-    @Autowired
-    private ImageService imageService;
 
     // user의 posts 조회
     public List<PostResponseDTO> getPosts(PostCategory category) {

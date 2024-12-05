@@ -1,7 +1,7 @@
 package com.tilon.ojt_back.domain.manage;
 
 import java.time.LocalDateTime;
-
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +20,4 @@ public class PostResponseDTO {
     private PostStatus status;
     private PostFix fix;
     private String link;
-    private String imageUrl;
 }

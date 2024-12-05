@@ -8,7 +8,7 @@
     <select id="getPostsRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostCategory"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
-        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link, image_url as imageUrl
+        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link
         FROM post
         WHERE category = #{category}
         ORDER BY created_at DESC;
@@ -16,9 +16,9 @@
 
     <!-- post 상세 조회 --> 
     <select id="getPostRow"
-            parameterType="com.tilon.ojt_back.domain.manage.PostCategory"
+            parameterType="int"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
-        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link, image_url as imageUrl
+        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link
         FROM post
         WHERE post_id = #{postId};
     </select>
@@ -26,15 +26,15 @@
     <!-- post 작성 -->
     <insert id="createPostRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostRequestDTO">
-        INSERT INTO post (title, content, category, admin_id as adminId, status, fix, link, image_url as imageUrl)
-        VALUES (#{title}, #{content}, #{category}, #{adminId}, #{status}, #{fix}, #{link}, #{imageUrl});
+        INSERT INTO post (title, content, category, admin_id, link)
+        VALUES (#{title}, #{content}, #{category}, #{adminId}, #{link});
     </insert>
 
     <!-- post 수정 -->
     <update id="updatePostRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostRequestDTO">
         UPDATE post
-        SET title = #{title}, content = #{content}, status = #{status}, fix = #{fix}, link = #{link}, image_url = #{imageUrl}
+        SET title = #{title}, content = #{content}, link = #{link}
         WHERE post_id = #{postId};
     </update>
 
