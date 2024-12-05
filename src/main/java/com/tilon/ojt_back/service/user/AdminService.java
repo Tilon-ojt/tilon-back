@@ -76,13 +76,10 @@ public class AdminService {
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
-<<<<<<< HEAD
             response.put("adminId", user.getAdminId());
             response.put("role", user.getRole());
             response.put("empName", user.getEmpName());
             response.put("nickname", user.getNickname());
-=======
->>>>>>> feature/user
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
