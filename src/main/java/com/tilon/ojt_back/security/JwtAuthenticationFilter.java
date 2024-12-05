@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         logger.info("사용자 정보 추출 성공: {}", userDetails.getUsername());
 
         // 요청된 엔드포인트에 필요한 역할을 사용자가 가지고 있는지 확인
-        if (requestURI.startsWith("/admin/accounts/") &&
+        if (requestURI.startsWith("/admin/accounts") &&
                 userDetails.getAuthorities().stream()
                         .noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
             logger.warn("SUPER_ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
@@ -76,7 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (requestURI.startsWith("/admin/posts/") &&
+        if (requestURI.startsWith("/admin/posts") &&
                 userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")
                         || auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
             logger.warn("ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);

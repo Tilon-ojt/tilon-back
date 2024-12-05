@@ -60,6 +60,7 @@ public class AdminService {
             CustomUserDetails userDetails = new CustomUserDetails(
                     user.getAdminId(),
                     user.getEmpName(),
+                    user.getNickname(),
                     user.getPassword(),
                     new ArrayList<>(),
                     user.getRole());

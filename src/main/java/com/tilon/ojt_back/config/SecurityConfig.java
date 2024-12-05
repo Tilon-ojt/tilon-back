@@ -42,8 +42,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> {
                     requests
                             .requestMatchers("/v3/api-docs", "/swagger-ui/**", "/swagger-resources/**").permitAll() // Swagger
-                            .requestMatchers("/admin/posts/**").hasAnyRole("SUPER_ADMIN", "ADMIN") // ADMIN과 SUPER_ADMIN
-                            .requestMatchers("/admin/accounts/**").hasRole("SUPER_ADMIN") // SUPER_ADMIN만 접근 가능
+                            .requestMatchers("/admin/posts").hasAnyRole("SUPER_ADMIN", "ADMIN") // ADMIN과 SUPER_ADMIN
+                            .requestMatchers("/admin/accounts").hasRole("SUPER_ADMIN") // SUPER_ADMIN만 접근 가능
                             .requestMatchers("/admin/logout", "/admin/account", "/admin/info").authenticated() // 인증된
                                                                                                                // 사용자만
                             .requestMatchers("/admin/password").hasRole("ADMIN") // 일반 어드민만 접근 가능

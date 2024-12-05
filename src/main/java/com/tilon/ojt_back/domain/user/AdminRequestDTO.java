@@ -12,7 +12,7 @@ public class AdminRequestDTO {
     private String empName; // 사번
     private String password; // 암호화된 비밀번호
     private String role; // 역할 (SUPER_ADMIN, ADMIN)
-    private String email;
+    private String nickname;
     private String createdAt;
     private String updatedAt;
 

@@ -53,7 +53,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(
                 user.getAdminId(),
                 user.getEmpName(),
-
+                user.getNickname(),
                 user.getPassword(),
                 authorities,
                 role);

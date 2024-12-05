@@ -45,8 +45,9 @@ public class JwtTokenProvider {
             String tokenType) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("adminId", userDetails.getAdminId());
-        claims.put("empName", userDetails.getEmpName());
+        claims.put("empName", userDetails.getUsername());
         claims.put("role", userDetails.getRole());
+        claims.put("nickname", userDetails.getNickName());
         claims.put("tokenType", tokenType);
 
         logger.info("Creating token with claims: {}", claims);
@@ -68,13 +69,14 @@ public class JwtTokenProvider {
         int adminId = claims.get("adminId", Integer.class);
         String empName = claims.get("empName", String.class);
         String role = claims.get("role", String.class);
+        String nickname = claims.get("nickname", String.class);
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         if (role != null && !role.isEmpty()) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
 
-        return new CustomUserDetails(adminId, empName, "password", authorities, role);
+        return new CustomUserDetails(adminId, empName, null, nickname, authorities, role);
     }
 
     // 토큰 만료 여부 확인
@@ -130,6 +132,6 @@ public class JwtTokenProvider {
     public int getUserIdFromToken(String token) {
         Claims claims = extractClaims(token);
         logger.info("Extracted claims from token: {}", claims); // 클레임 로그 추가
-        return claims.get("adminId", Integer.class); // 클레임에서 adminId를 가져옴
+        return claims.get("adminId", Integer.class); // 클레임에서 adminId��� 가져옴
     }
 }
