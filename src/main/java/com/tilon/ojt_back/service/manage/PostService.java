@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tilon.ojt_back.dao.manage.PostMapper;
@@ -14,11 +15,13 @@ import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostRequestDTO;
 import com.tilon.ojt_back.domain.manage.PostResponseDTO;
 import com.tilon.ojt_back.domain.manage.PostStatus;
+import com.tilon.ojt_back.service.ImageService;
 import com.tilon.ojt_back.domain.manage.PostFix;
 
 @Service
 public class PostService {
     @Autowired private PostMapper postMapper;
+    @Autowired private ImageService imageService;
 
     // post 조회
     public List<PostResponseDTO> getPosts(PostCategory category) {
@@ -31,8 +34,13 @@ public class PostService {
     }
 
     // post 작성
-    public void createPost(PostRequestDTO param) {
+    public void createPost(PostRequestDTO param, MultipartFile ImgFile) {
+        // post 작성
         postMapper.createPostRow(param);
+        // ImgFile이 존재한다면 이미지들 ,(쉼표)로 구분하여 String으로 만들고 db에 저장, 서버에 이미지들 저장
+        if(ImgFile != null){
+            imageService.uploadImages(new MultipartFile[]{ImgFile}, param.getPostId());
+        }
     }
 
     // post 수정

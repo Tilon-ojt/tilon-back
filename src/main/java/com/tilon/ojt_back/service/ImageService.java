@@ -22,27 +22,51 @@ public class ImageService {
 
     @Autowired
     private ImageMapper imageMapper;
+
+    // 이미지 조회
+    public List<String> getImages(int postId) {
+        // 데이터베이스에서 이미지 이름 가져오기
+        List<String> imageNames = getImageNamesFromDB(postId);
+        // 이미지 URL 생성
+        List<String> imageUrls = new ArrayList<>();
+        for (String imageName : imageNames) {
+            String imageUrl = "/static/images/" + imageName;
+            imageUrls.add(imageUrl);
+        }
+        return imageUrls;
+    }
     
     // 이미지 업로드
     @Transactional
-    public List<String> uploadImages(MultipartFile[] files, int postId){
+    public void uploadImages(MultipartFile[] files, int postId){
+        // 데이터베이스에서 기존 이미지 목록 가져오기
+        List<String> existingFileNames = getImageNamesFromDB(postId);
+        if(!existingFileNames.isEmpty()){
+            // 기존 이미지 삭제
+            for (String imageUrl : existingFileNames) {
+                deleteImage(imageUrl);
+            }
+        }
+
         List<String> fileNames = new ArrayList<>();
-        
         for (MultipartFile file : files) {
+            // 이미지 이름 생성
             String fileName = generateImageName(file.getOriginalFilename());
+            // 이미지 경로 생성
             String filePath = "resource/static/images/" + fileName;
 
             try {
+                // 서버에 이미지 저장
                 file.transferTo(new File(filePath));
+                // 이미지 이름 리스트에 추가
                 fileNames.add(fileName);
             } catch (IOException e) {
                 throw new RuntimeException("파일 업로드 중 오류 발생: " + e.getMessage(), e);
             }
         }
         
-        // 모든 이미지 이름을 데이터베이스에 저장
+        // 모든 이미지 이름을 하나의 String으로 만들고 데이터베이스에 저장
         saveImageNameToDB(fileNames, postId);
-        return fileNames;
     }
         
     // 이미지 이름 생성
@@ -68,35 +92,6 @@ public class ImageService {
         } catch (Exception e){
             throw new RuntimeException("이미지 이름 저장 중 오류 발생: " + e.getMessage(), e);
         }
-    }
-    
-    // 이미지 조회
-    public List<String> getImages(int postId) {
-        // 데이터베이스에서 이미지 이름 가져오기
-        List<String> imageNames = getImageNamesFromDB(postId);
-        // 이미지 URL 생성
-        List<String> imageUrls = new ArrayList<>();
-        for (String imageName : imageNames) {
-            String imageUrl = "/static/images/" + imageName;
-            imageUrls.add(imageUrl);
-        }
-        return imageUrls;
-    }
-
-    // 서버에서 이미지 업데이트
-    @Transactional
-    public void updateImages(MultipartFile[] newFiles, int postId) {
-        // 데이터베이스에서 기존 이미지 목록 가져오기
-        List<String> existingFileNames = getImageNamesFromDB(postId);
-        
-        // 기존 이미지 삭제
-        for (String imageUrl : existingFileNames) {
-            deleteImage(imageUrl);
-        }
-        // 새로운 이미지 업로드
-        List<String> newFileNames = uploadImages(newFiles, postId);
-        // 데이터베이스 업데이트
-        saveImageNameToDB(newFileNames, postId);
     }
 
     // 데이터베이스에서 이미지 이름 가져오기

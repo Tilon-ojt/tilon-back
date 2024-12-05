@@ -50,7 +50,8 @@ dependencies {
     // 비밀번호 암호화
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	
+	// 최신 버전 확인
+	implementation 'org.json:json:20230227' // 최신 버전 확인
 
 	
     // JWT 관련 의존성 (최신 버전 사용 권장)

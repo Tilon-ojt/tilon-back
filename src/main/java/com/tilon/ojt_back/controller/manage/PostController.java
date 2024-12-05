@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tilon.ojt_back.domain.manage.PostCategory;
@@ -46,8 +47,10 @@ public class PostController {
 
     // post 작성
     @PostMapping("")
-    public ResponseEntity<Void> createPost(@RequestBody PostRequestDTO param) {
-        postService.createPost(param);
+    public ResponseEntity<Void> createPost(
+        @RequestBody PostRequestDTO param,
+        @RequestParam(value = "ImgFile", required = false) MultipartFile ImgFile) {
+        postService.createPost(param, ImgFile);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
