@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,9 @@ public class AdminService {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Value("${default-password}")
+    private String DEFAULT_PASSWORD;
 
     // 1. 어드민 목록 조회
     public List<AdminResponseDTO> getAdminList() {
@@ -72,9 +76,6 @@ public class AdminService {
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
-            response.put("adminId", user.getAdminId());
-            response.put("role", user.getRole());
-            response.put("empName", user.getEmpName());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -96,7 +97,7 @@ public class AdminService {
             }
 
             // 비밀번호 암호화
-            String encodedPassword = passwordEncoder.encode(adminRequestDTO.getPassword());
+            String encodedPassword = passwordEncoder.encode(DEFAULT_PASSWORD);
             adminRequestDTO.setPassword(encodedPassword);
 
             // 매퍼를 통해 어드민 등록
