@@ -60,8 +60,8 @@ public class AdminService {
             CustomUserDetails userDetails = new CustomUserDetails(
                     user.getAdminId(),
                     user.getEmpName(),
-                    user.getNickname(),
                     user.getPassword(),
+                    user.getNickname(),
                     new ArrayList<>(),
                     user.getRole());
 
@@ -75,6 +75,7 @@ public class AdminService {
             response.put("adminId", user.getAdminId());
             response.put("role", user.getRole());
             response.put("empName", user.getEmpName());
+            response.put("nickname", user.getNickname());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
