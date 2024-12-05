@@ -8,9 +8,8 @@
     <select id="getAdminList" resultType="com.tilon.ojt_back.domain.user.AdminResponseDTO">
         SELECT 
             admin_id AS adminId, 
-            empno, 
+            emp_name AS empName, 
             password, 
-            admin_name AS adminName, 
             role, 
             created_at AS createdAt, 
             updated_at AS updatedAt, 
@@ -19,13 +18,12 @@
             admin
     </select>
 
-    <!-- 2. empno로 사용자 정보를 조회하는 쿼리 -->
-    <select id="getUserByEmpno" parameterType="string" resultType="com.tilon.ojt_back.domain.user.AdminResponseDTO">
+    <!-- 2. empName로 사용자 정보를 조회하는 쿼리 -->
+    <select id="getUserByEmpName" parameterType="string" resultType="com.tilon.ojt_back.domain.user.AdminResponseDTO">
         SELECT 
             admin_id AS adminId, 
-            empno, 
+            emp_name As empName, 
             password, 
-            admin_name AS adminName, 
             role, 
             created_at AS createdAt, 
             updated_at AS updatedAt, 
@@ -33,20 +31,20 @@
         FROM 
             admin
         WHERE 
-            empno = #{empno}
+            emp_name = #{empName}
     </select>
 
     <!-- 3. 사용자 추가 -->
     <insert id="insertAdmin" parameterType="com.tilon.ojt_back.domain.user.AdminRequestDTO">
-        INSERT INTO admin (empno, password, admin_name, email)
-        VALUES (#{empno}, #{password}, #{adminName}, #{email})
+        INSERT INTO admin (emp_name, password, email)
+        VALUES (#{empName}, #{password}, #{email})
     </insert>
 
     <!-- 사용자 추가 후 존재 여부 검증 -->
-    <select id="existsByEmpno" parameterType="string" resultType="boolean">
+    <select id="existsByEmpName" parameterType="string" resultType="boolean">
         SELECT COUNT(1) > 0
         FROM admin
-        WHERE empno = #{empno}
+        WHERE emp_name = #{empName}
     </select>
 
 </mapper>

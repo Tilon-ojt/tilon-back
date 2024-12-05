@@ -25,19 +25,19 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String empno) throws UsernameNotFoundException {
-        logger.info("Attempting to load user by empno: {}", empno);
-        
-        AdminResponseDTO user = adminMapper.getUserByEmpno(empno);
+    public UserDetails loadUserByUsername(String empName) throws UsernameNotFoundException {
+        logger.info("Attempting to load user by empName: {}", empName);
+
+        AdminResponseDTO user = adminMapper.getUserByEmpName(empName);
         if (user == null) {
-            logger.warn("User not found: {}", empno);
-            throw new UsernameNotFoundException("User not found: " + empno);
+            logger.warn("User not found: {}", empName);
+            throw new UsernameNotFoundException("User not found: " + empName);
         }
 
         String role = user.getRole();
         if (role == null || role.isEmpty()) {
-            logger.warn("Role is null or empty for user: {}", empno);
-            throw new UsernameNotFoundException("Role not found for user: " + empno);
+            logger.warn("Role is null or empty for user: {}", empName);
+            throw new UsernameNotFoundException("Role not found for user: " + empName);
         }
 
         if (!role.startsWith("ROLE_")) {
@@ -47,13 +47,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(role));
 
-        logger.info("User found: {}, Role: {}", user.getAdminName(), role);
+        logger.info("User found: {}, Role: {}", user.getEmpName(), role);
         logger.info("Granted Authorities: {}", authorities);
 
         return new CustomUserDetails(
                 user.getAdminId(),
-                user.getEmpno(),
-                user.getAdminName(),
+                user.getEmpName(),
+
                 user.getPassword(),
                 authorities,
                 role);

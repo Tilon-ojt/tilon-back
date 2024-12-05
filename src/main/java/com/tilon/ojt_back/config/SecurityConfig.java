@@ -43,7 +43,8 @@ public class SecurityConfig {
                     requests
                             .requestMatchers("/v3/api-docs", "/swagger-ui/**", "/swagger-resources/**").permitAll() // Swagger
                             .requestMatchers("/admin/post/**").hasAnyRole("SUPER_ADMIN", "ADMIN") // ADMIN과 SUPER_ADMIN
-                            .requestMatchers("/admin/**").hasRole("SUPER_ADMIN") // SUPER_ADMIN만 접근 가능
+                            .requestMatchers("/admin/account/**").hasRole("SUPER_ADMIN") // SUPER_ADMIN만 접근 가능
+                            .requestMatchers("/admin/logout").authenticated() // 로그아웃은 인증된 사용자만
                             .requestMatchers("/static/**").permitAll() // 정적 리소스 접근 허용
                             .anyRequest().permitAll(); // 나머지 요청은 허용
                     logger.info("Security configuration applied"); // 보안 설정 로그 추가

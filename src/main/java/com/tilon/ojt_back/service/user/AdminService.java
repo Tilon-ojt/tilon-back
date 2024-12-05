@@ -40,27 +40,26 @@ public class AdminService {
     public ResponseEntity<Map<String, Object>> login(LoginDTO loginDTO) {
         try {
             // 로그 추가: 로그인 시도
-            System.out.println("로그인 시도: " + loginDTO.getEmpno());
+            System.out.println("로그인 시도: " + loginDTO.getEmpName());
 
-            AdminResponseDTO user = adminMapper.getUserByEmpno(loginDTO.getEmpno());
+            AdminResponseDTO user = adminMapper.getUserByEmpName(loginDTO.getEmpName());
             if (user == null) {
                 // 로그 추가: 사용자 정보 없음
-                System.out.println("사용자 정보 없음: " + loginDTO.getEmpno());
+                System.out.println("사용자 정보 없음: " + loginDTO.getEmpName());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
             }
 
             if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 // 로그 추가: 비밀번호 불일치
-                System.out.println("비밀번호 불일치: " + loginDTO.getEmpno());
+                System.out.println("비밀번호 불일치: " + loginDTO.getEmpName());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
             }
 
             CustomUserDetails userDetails = new CustomUserDetails(
                     user.getAdminId(),
-                    user.getEmpno(),
-                    user.getAdminName(),
+                    user.getEmpName(),
                     user.getPassword(),
                     new ArrayList<>(),
                     user.getRole());
@@ -68,12 +67,13 @@ public class AdminService {
             String token = jwtTokenProvider.createAccessToken(userDetails);
 
             // 로그 추가: 토큰 생성 성공
-            System.out.println("토큰 생성 성공: " + user.getEmpno());
+            System.out.println("토큰 생성 성공: " + user.getEmpName());
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
             response.put("adminId", user.getAdminId());
             response.put("role", user.getRole());
+            response.put("empName", user.getEmpName());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -88,7 +88,7 @@ public class AdminService {
     public ResponseEntity<Map<String, Object>> registerAdmin(AdminRequestDTO adminRequestDTO) throws Exception {
         try {
             // 어드민 존재 여부 확인
-            AdminResponseDTO existingAdmin = adminMapper.getUserByEmpno(adminRequestDTO.getEmpno());
+            AdminResponseDTO existingAdmin = adminMapper.getUserByEmpName(adminRequestDTO.getEmpName());
             if (existingAdmin != null) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(Collections.singletonMap("message", "이미 존재하는 어드민입니다."));
@@ -100,10 +100,10 @@ public class AdminService {
 
             // 매퍼를 통해 어드민 등록
             adminMapper.insertAdmin(adminRequestDTO);
-            System.out.println("어드민 등록 성공: " + adminRequestDTO.getEmpno());
+            System.out.println("어드민 등록 성공: " + adminRequestDTO.getEmpName());
 
             // 등록된 어드민 정보 조회
-            AdminResponseDTO newAdmin = adminMapper.getUserByEmpno(adminRequestDTO.getEmpno());
+            AdminResponseDTO newAdmin = adminMapper.getUserByEmpName(adminRequestDTO.getEmpName());
 
             // 응답 데이터 구성
             Map<String, Object> response = new HashMap<>();

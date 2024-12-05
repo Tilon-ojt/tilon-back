@@ -53,41 +53,69 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Access 토큰이 아니거나 만료된 경우
         try {
             if (!jwtTokenProvider.isAccessToken(token) || jwtTokenProvider.isExpired(token)) {
+                logger.warn("유효하지 않거나 만료된 토��: {}", token);
                 errorResponse(response);
                 return;
             }
         } catch (JwtTokenProvider.TokenValidationException e) {
+            logger.error("토큰 검증 중 오류 발생: {}", e.getMessage());
             errorResponse(response);
             return;
         }
 
-        // jwtTokenProvider를 사용해 토큰에서 사용자 정보 추출 : 정보 인증을 위해 사용
+        // jwtTokenProvider를 사용해 토큰에서 사용자 정보 추출
         CustomUserDetails userDetails = jwtTokenProvider.getUserDetailsFromToken(token);
+        logger.info("사용자 정보 추출 성공: {}", userDetails.getUsername());
 
-        // 추가된 코드: ADMIN 역할이지만 SUPER_ADMIN이 아닌 경우 예외 처리
-        if (userDetails.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")) &&
+        // 요청된 엔드포인트에 필요한 역할을 사용자가 가지고 있는지 확인
+        if (requestURI.startsWith("/admin/account/") &&
                 userDetails.getAuthorities().stream()
                         .noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
-            logger.warn("ADMIN 역할이지만 SUPER_ADMIN이 아님: {}", requestURI);
+            logger.warn("SUPER_ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
             errorResponse(response, "SUPER_ADMIN 권한이 필요합니다.");
             return;
         }
 
-        // 인증 토큰 생성 : 사용자 정보와 권한을 포함하고 있는 객체 생성(이 객체는 시큐리티 인증 매커니즘에 사용된다더라)
+        if (requestURI.startsWith("/admin/post/") &&
+                userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")
+                        || auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+            logger.warn("ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
+            errorResponse(response, "ADMIN 권한이 필요합니다.");
+            return;
+        }
+
+        // 로그아웃 요청 처리
+        if (requestURI.equals("/admin/logout")) {
+            logger.info("로그아웃 요청 처리 중...");
+
+            // 사용자 권한 확인
+            if (userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")
+                    || auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+                logger.warn("로그아웃 권한이 없는 사용자: {}", userDetails.getUsername());
+                errorResponse(response, "로그아웃 권한이 필요합니다.");
+                return;
+            }
+
+            // 로그아웃 요청 시에도 토큰 유효성 검사 추가
+            if (jwtTokenProvider.isExpired(token)) {
+                logger.warn("만료된 토큰으로 로그아웃 요청: {}", requestURI);
+                errorResponse(response);
+                return;
+            }
+        }
+
+        // 인증 토큰 생성 및 SecurityContext 설정
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); // 인증토큰에 요청에 대한 세부정보
-                                                                                                    // 설정(추가 정보 제공위함)
-
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken); // 인증 토큰을 시큐리티 컨테스트에 저장 -> 이후 요청 처리에서
-                                                                                   // 인증된 사용자 정보 사용
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         logger.info("Authentication 인증 정보 로깅 : {}", SecurityContextHolder.getContext().getAuthentication());
 
-        // 다음 필터 요청 전달 (필터체인 진행 )
+        // 다음 필터 요청 전달
         filterChain.doFilter(request, response);
 
-        logger.info("처리중인  for URI: {}", requestURI);
+        logger.info("처리중인 URI: {}", requestURI);
     }
 
     private void errorResponse(HttpServletResponse response) throws IOException {

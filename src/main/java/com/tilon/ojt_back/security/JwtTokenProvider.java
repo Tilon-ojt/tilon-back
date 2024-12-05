@@ -45,7 +45,7 @@ public class JwtTokenProvider {
             String tokenType) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("adminId", userDetails.getAdminId());
-        claims.put("empno", userDetails.getEmpno());
+        claims.put("empName", userDetails.getEmpName());
         claims.put("role", userDetails.getRole());
         claims.put("tokenType", tokenType);
 
@@ -62,11 +62,11 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // CustomUserDetails에서 adminId와 empno 꺼내기
+    // CustomUserDetails에서 adminId와 empName 꺼내기
     public CustomUserDetails getUserDetailsFromToken(String token) {
         Claims claims = extractClaims(token);
         int adminId = claims.get("adminId", Integer.class);
-        String empno = claims.get("empno", String.class);
+        String empName = claims.get("empName", String.class);
         String role = claims.get("role", String.class);
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
@@ -74,7 +74,7 @@ public class JwtTokenProvider {
             authorities.add(new SimpleGrantedAuthority(role));
         }
 
-        return new CustomUserDetails(adminId, empno, "defaultAdminName", "password", authorities, role);
+        return new CustomUserDetails(adminId, empName, "password", authorities, role);
     }
 
     // 토큰 만료 여부 확인
