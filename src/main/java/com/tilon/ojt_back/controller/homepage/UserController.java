@@ -21,7 +21,7 @@ public class UserController {
     private UserService userService;
 
     // user의 post 조회
-    @GetMapping("/post")
+    @GetMapping("/posts")
     public ResponseEntity<List<PostResponseDTO>> getPosts(@RequestParam(name = "category") PostCategory category) {
         return ResponseEntity.ok(userService.getPosts(category));
     }

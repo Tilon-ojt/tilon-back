@@ -16,7 +16,7 @@
 
     <!-- post 상세 조회 --> 
     <select id="getPostRow"
-            parameterType="com.tilon.ojt_back.domain.manage.PostCategory"
+            parameterType="int"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
         SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link
         FROM post
@@ -26,15 +26,15 @@
     <!-- post 작성 -->
     <insert id="createPostRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostRequestDTO">
-        INSERT INTO post (title, content, category, admin_id, status, fix, link)
-        VALUES (#{title}, #{content}, #{category}, #{adminId}, #{status}, #{fix}, #{link});
+        INSERT INTO post (title, content, category, admin_id, link)
+        VALUES (#{title}, #{content}, #{category}, #{adminId}, #{link});
     </insert>
 
     <!-- post 수정 -->
     <update id="updatePostRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostRequestDTO">
         UPDATE post
-        SET title = #{title}, content = #{content}, status = #{status}, fix = #{fix}, link = #{link}
+        SET title = #{title}, content = #{content}, link = #{link}
         WHERE post_id = #{postId};
     </update>
 
