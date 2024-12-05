@@ -27,7 +27,7 @@ import com.tilon.ojt_back.service.manage.PostService;
 
 
 @RestController
-@RequestMapping("/admin/post")
+@RequestMapping("/admin/posts")
 public class PostController {
     @Autowired
     private PostService postService;
@@ -47,10 +47,8 @@ public class PostController {
 
     // post 작성
     @PostMapping("")
-    public ResponseEntity<Void> createPost(
-        @RequestBody PostRequestDTO param,
-        @RequestParam(value = "ImgFile", required = false) MultipartFile ImgFile) {
-        postService.createPost(param, ImgFile);
+    public ResponseEntity<Void> createPost(@RequestBody PostRequestDTO param) {
+        postService.createPost(param);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
