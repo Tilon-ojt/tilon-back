@@ -64,25 +64,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // jwtTokenProvider를 사용해 토큰에서 사용자 정보 추출 : 정보 인증을 위해 사용
         CustomUserDetails userDetails = jwtTokenProvider.getUserDetailsFromToken(token);
 
-        // 추가된 코드: ADMIN 역할이지만 SUPER_ADMIN이 아닌 경우 예외 처리
-        if (userDetails.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")) &&
-                userDetails.getAuthorities().stream()
-                        .noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
-            logger.warn("ADMIN 역할이지만 SUPER_ADMIN이 아님: {}", requestURI);
-            errorResponse(response, "SUPER_ADMIN 권한이 필요합니다.");
-            return;
-        }
+        // // 추가된 코드: ADMIN 역할이지만 SUPER_ADMIN이 아닌 경우 예외 처리
+        // if (userDetails.getAuthorities().stream().anyMatch(auth ->
+        // auth.getAuthority().equals("ROLE_ADMIN")) &&
+        // userDetails.getAuthorities().stream()
+        // .noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+        // logger.warn("ADMIN 역할이지만 SUPER_ADMIN이 아님: {}", requestURI);
+        // errorResponse(response, "SUPER_ADMIN 권한이 필요합니다.");
+        // return;
+        // }
 
         // 요청된 엔드포인트에 필요한 역할을 사용자가 가지고 있는지 확인
-        if (requestURI.startsWith("/admin/account/") && 
-            userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+        if (requestURI.startsWith("/admin/account/") &&
+                userDetails.getAuthorities().stream()
+                        .noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
             logger.warn("SUPER_ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
             errorResponse(response, "SUPER_ADMIN 권한이 필요합니다.");
             return;
         }
 
-        if (requestURI.startsWith("/admin/post/") && 
-            userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN") || auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+        if (requestURI.startsWith("/admin/post/") &&
+                userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")
+                        || auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
             logger.warn("ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
             errorResponse(response, "ADMIN 권한이 필요합니다.");
             return;
