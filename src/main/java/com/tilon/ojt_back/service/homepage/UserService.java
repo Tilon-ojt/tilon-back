@@ -20,16 +20,26 @@ public class UserService {
 
     // user의 posts 조회
     public List<PostResponseDTO> getPosts(PostCategory category) {
-        return userMapper.getPostsRow(category);
+        List<PostResponseDTO> posts = userMapper.getPostsRow(category);
+        for(PostResponseDTO post : posts) {
+            post.setImageUrl(imageService.getImages(post.getPostId()));
+        }
+        return posts;
     }
 
     // user의 post 상세 조회
     public PostResponseDTO getPost(int postId) {
-        return userMapper.getPostRow(postId);
+        PostResponseDTO post = userMapper.getPostRow(postId);
+        post.setImageUrl(imageService.getImages(postId));
+        return post;
     }
 
     // user의 homepage 조회
     public List<PostResponseDTO> getHomepage(PostCategory category) {
-        return userMapper.getHomepage(category);
+        List<PostResponseDTO> posts = userMapper.getHomepage(category);
+        for(PostResponseDTO post : posts) {
+            post.setImageUrl(imageService.getImages(post.getPostId()));
+        }
+        return posts;
     }
 }
