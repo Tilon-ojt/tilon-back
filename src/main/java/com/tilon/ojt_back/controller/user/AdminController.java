@@ -23,8 +23,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
+@RequestMapping("/admin")
 public class AdminController {
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
@@ -34,8 +38,10 @@ public class AdminController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    //1. super_amdin 권한 필요
+
     // 어드민 목록 조회
-    @GetMapping("/admin/accounts")
+    @GetMapping("/accounts")
     public List<AdminResponseDTO> getAdminList() {
         logger.info("Admin list request received");
         List<AdminResponseDTO> adminList = adminService.getAdminList();
@@ -44,7 +50,7 @@ public class AdminController {
     }
 
     // 어드민 등록
-    @PostMapping("/admin/accounts")
+    @PostMapping("/accounts")
     public ResponseEntity<Map<String, Object>> registerAdmin(@RequestBody AdminRequestDTO adminRequestDTO) {
         logger.info("Admin register request received: {}", adminRequestDTO);
         try {
@@ -59,25 +65,26 @@ public class AdminController {
         }
     }
 
-    // 어드민 로그인
-    @PostMapping("/user/login")
-    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginDTO loginDTO) {
+    // 계정 비밀번호 초기화 
+    @PutMapping("/accounts/{adminId}/reset-password")
+    public ResponseEntity<Map<String, Object>> resetPassword(@PathVariable String adminId) {
+        logger.info("비밀번호 리셋할 어드민 아이디: {}", adminId);
         try {
-            // 로그인 메서드 호출
-            ResponseEntity<Map<String, Object>> responseEntity = adminService.login(loginDTO);
-            // 로그인 서비스에서 반환된 응답을 그대로 반환
-            return responseEntity; // JSON 형식으로 응답 반환
+            // 비밀번호 초기화 요청을 서비스에 전달
+            ResponseEntity<Map<String, Object>> response = adminService.resetPassword(adminId);
+            return response;
         } catch (Exception e) {
-            // 예외 처리: 로그 추가
-            System.err.println("로그인 중 오류 발생: " + e.getMessage());
+            logger.error("비밀번호 초기화 중 오류 발생: {}", e.getMessage());
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "로그인 중 오류가 발생했습니다.");
+            errorResponse.put("message", "비밀번호 초기화 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
+    //2. super_admin + admin 권한 필요
+
     // 어드민 로그아웃
-    @PostMapping("/admin/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Map<String, Object>> logoutAdmin(@RequestHeader("Authorization") String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             Map<String, Object> errorResponse = new HashMap<>();
