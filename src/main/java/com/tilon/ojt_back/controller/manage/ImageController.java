@@ -1,4 +1,4 @@
-package com.tilon.ojt_back.controller;
+package com.tilon.ojt_back.controller.manage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.tilon.ojt_back.service.ImageService;
+import com.tilon.ojt_back.service.manage.ImageService;
 
 @RestController
 @RequestMapping("/admin/posts/image")
