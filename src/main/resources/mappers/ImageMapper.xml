@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tilon.ojt_back.dao.manage.ImageMapper">
+
+  <insert id="insertImageRow"
+          parameterType="map">
+    INSERT INTO images (post_id, file_name, file_path)
+    VALUES (#{postId}, #{fileName}, #{filePath})
+  </insert>
+
+</mapper>
