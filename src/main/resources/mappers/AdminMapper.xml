@@ -47,4 +47,30 @@
         WHERE emp_name = #{empName}
     </select>
 
+    <!-- 4. 비밀번호 초기화 쿼리 -->
+    <update id="resetPassword" parameterType="map">
+        UPDATE admin
+        SET password = #{password}
+        WHERE admin_id = #{adminId}
+    </update>
+
+    <!-- 5. 비밀번호 동일성 체크-->
+    <select id="getCurrentPassword" parameterType="int" resultType="string">
+      SELECT password FROM admin WHERE admin_id = #{adminId}
+    </select>
+
+    <!-- 6. 계정 정보 변경-->
+    <update id="updateAdminInfo" parameterType="com.tilon.ojt_back.domain.user.AdminUpdateDTO">
+     UPDATE admin SET password=#{password}, nickname=#{nickname} WHERE admin_id=#{adminId}
+    </update>
+
+     <!-- 7. 여러 adminId를 한 번에 삭제하는 쿼리 -->
+    <delete id="deleteByAdminIds" parameterType="list">
+        DELETE FROM Admin
+        WHERE admin_id IN
+        <foreach item="id" collection="adminIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

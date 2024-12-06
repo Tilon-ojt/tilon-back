@@ -30,7 +30,7 @@ public class JwtTokenProvider {
     private String SECRET_KEY; // 인스턴스 필드로 변경
 
     // Access Token 만료 시간
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 24 * 60 * 60 * 1000L; // 24시간
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 6 * 60 * 60 * 1000L; // 6시간
 
     // 만료된 토큰을 저장할 블랙리스트
     private Set<String> blacklist = ConcurrentHashMap.newKeySet();
@@ -128,10 +128,10 @@ public class JwtTokenProvider {
         return blacklist.contains(token);
     }
 
-    // 회원탈퇴를 위한 토큰에서 사용자 ID 추출
+    // 토큰에서 사용자 ID 추출
     public int getUserIdFromToken(String token) {
         Claims claims = extractClaims(token);
         logger.info("Extracted claims from token: {}", claims); // 클레임 로그 추가
-        return claims.get("adminId", Integer.class); // 클레임에서 adminId��� 가져옴
+        return claims.get("adminId", Integer.class); // 클레임에서 adminId 가져옴
     }
 }
