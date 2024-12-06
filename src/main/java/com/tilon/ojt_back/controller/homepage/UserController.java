@@ -27,7 +27,7 @@ public class UserController {
     }
 
     // user의 post 상세 조회
-    @GetMapping("/{postId}")
+    @GetMapping("/posts/{postId}")
     public ResponseEntity<PostResponseDTO> getPost(@PathVariable int postId) {
         return ResponseEntity.ok(userService.getPost(postId));
     }
