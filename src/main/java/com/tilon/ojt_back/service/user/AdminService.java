@@ -64,7 +64,7 @@ public class AdminService {
 
             if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 // 로그 추가: 비밀번호 불일치
-                System.out.println("비밀번호 불일치: " + loginDTO.getEmpName());
+                System.out.println("비밀번호  불일치: " + loginDTO.getEmpName());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
             }
@@ -108,8 +108,20 @@ public class AdminService {
                         .body(Collections.singletonMap("message", "이미 존재하는 어드민입니다."));
             }
 
+            // empName 유효성 검사: 영어만 가능
+            if (!isValidEmpName(adminRequestDTO.getEmpName())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", "empName은 영어만 포함해야 합니다."));
+            }
+
+            // 비밀번호 유효성 검사: 영어, 숫자 조합으로 6자 이상
+            if (!isValidPassword(adminRequestDTO.getPassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Collections.singletonMap("message", "비밀번호는 영어와 숫자의 조합으로 6자 이상이어야 합니다."));
+            }
+
             // 비밀번호 암호화
-            String encodedPassword = passwordEncoder.encode(DEFAULT_PASSWORD);
+            String encodedPassword = passwordEncoder.encode(adminRequestDTO.getPassword());
             adminRequestDTO.setPassword(encodedPassword);
 
             // 매퍼를 통해 어드민 등록
@@ -124,11 +136,22 @@ public class AdminService {
             response.put("message", "어드민이 성공적으로 등록되었습니다.");
             response.put("admin", newAdmin);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             e.printStackTrace(); // 예외 로그 출력
-            throw e; // 예외 다시 던지기
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "어드민 등록 중 오류가 발생했습니다."));
         }
+    }
+
+    // empName 유효성 검사 메서드 추가
+    private boolean isValidEmpName(String empName) {
+        return empName.matches("^[a-zA-Z]+$"); // 영어만 포함하는지 확인
+    }
+
+    // 비밀번호 유효성 검사 메서드 추가
+    private boolean isValidPassword(String password) {
+        return password.length() >= 6 && password.matches("^(?=.*[a-zA-Z])(?=.*[0-9]).+$");
     }
 
     // 4. 비밀번호 초기화
@@ -185,7 +208,7 @@ public class AdminService {
         try {
             adminUpdateDTO.setAdminId(adminId);
 
-            // 비밀번호 암호화
+            // 비밀���호 암호화
             String encodedPassword = passwordEncoder.encode(adminUpdateDTO.getPassword());
             adminUpdateDTO.setPassword(encodedPassword);
 
