@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Access 토큰이 아니거나 만료된 경우
         try {
             if (!jwtTokenProvider.isAccessToken(token) || jwtTokenProvider.isExpired(token)) {
-                logger.warn("유효하지 않거나 만료된 토큰: {}", token);
+                logger.warn("유효하지 않거나 만료된 토��: {}", token);
                 errorResponse(response);
                 return;
             }
@@ -79,6 +79,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (requestURI.startsWith("/admin/posts") &&
                 userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN")
                         || auth.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+            logger.warn("ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
+            errorResponse(response, "ADMIN 권한이 필요합니다.");
+            return;
+        }
+
+        // /admin/update 및 /admin/check-password 경로에 대한 접근 권한 확인
+        if ((requestURI.startsWith("/admin/update") || requestURI.startsWith("/admin/check-password")) &&
+                userDetails.getAuthorities().stream()
+                        .noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
             logger.warn("ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
             errorResponse(response, "ADMIN 권한이 필요합니다.");
             return;

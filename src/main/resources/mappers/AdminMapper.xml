@@ -54,4 +54,14 @@
         WHERE admin_id = #{adminId}
     </update>
 
+    <!-- 5. 비밀번호 동일성 체크-->
+    <select id="getCurrentPassword" parameterType="int" resultType="string">
+      SELECT password FROM admin WHERE admin_id = #{adminId}
+    </select>
+
+    <!-- 6. 계정 정보 변경-->
+    <update id="updateAdminInfo" parameterType="com.tilon.ojt_back.domain.user.AdminUpdateDTO">
+     UPDATE admin SET password=#{password}, nickname=#{nickname} WHERE admin_id=#{adminId}
+    </update>
+
 </mapper>

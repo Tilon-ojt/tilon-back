@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tilon.ojt_back.domain.user.AdminRequestDTO;
 import com.tilon.ojt_back.domain.user.AdminResponseDTO;
+import com.tilon.ojt_back.domain.user.AdminUpdateDTO;
 import com.tilon.ojt_back.domain.user.LoginDTO;
 import com.tilon.ojt_back.security.JwtTokenProvider;
 import com.tilon.ojt_back.service.user.AdminService;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -39,7 +39,7 @@ public class AdminController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    //1. super_amdin 권한 필요
+    // 1. super_amdin 권한 필요
 
     // 어드민 목록 조회
     @GetMapping("/accounts")
@@ -61,12 +61,12 @@ public class AdminController {
         } catch (Exception e) {
             logger.error("Error during admin registration: {}", e.getMessage());
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "어드�� 등록 중 오류가 발생했습니다.");
+            errorResponse.put("message", "어드민 등록 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    // 계정 비밀번호 초기화 
+    // 계정 비밀번호 초기화
     @PutMapping("/accounts/{adminId}/reset-password")
     public ResponseEntity<Map<String, Object>> resetPassword(@PathVariable int adminId) {
         logger.info("비밀번호 리셋할 어드민 아이디: {}", adminId);
@@ -82,7 +82,7 @@ public class AdminController {
         }
     }
 
-    //2. super_admin + admin 권한 필요
+    // 2. super_admin + admin 권한 필요
 
     // 어드민 로그아웃
     @PostMapping("/logout")
@@ -110,27 +110,59 @@ public class AdminController {
         }
     }
 
+    // 비밀번호 동일성 확인
+    @PostMapping("/check-password")
+    public ResponseEntity<Map<String, Object>> checkPassword(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody AdminUpdateDTO adminUpdateDTO) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "유효한 토큰이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
 
-    //3. admin 권한 필요
-    // 비밀번호 변경 
-    @PatchMapping("/password")
-    public ResponseEntity<Map<String, Object>> changePassword(@RequestHeader("Authorization") String authorizationHeader, @RequestBody String password) {
-        String token = authorizationHeader.substring(7); 
-        logger.info("비밀번호 변경 요청을 위한 토큰: {}", token);
+        String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
+        int adminId = jwtTokenProvider.getUserIdFromToken(token);
+        String newPassword = adminUpdateDTO.getPassword();
+        logger.info("비밀번호 유효성 요청한 토큰: {}", token);
+        logger.info("요청한 비밀번호: {}", newPassword);
 
         try {
-            int adminId = jwtTokenProvider.getUserIdFromToken(token);
-            logger.info("비밀번호 변경 요청을 위한 토큰 추출 아이디: {}", adminId);
-            logger.info("비밀번호 변경 요청을 위한 새로운 비번: {}", password);
-            return adminService.changePassword(adminId, password);
+            Map<String, Object> response = adminService.checkPassword(adminId, newPassword);
+            return ResponseEntity.status((HttpStatus) response.get("status")).body(response);
         } catch (Exception e) {
-            logger.error("비밀번호 변경 중 오류 발생: {}", e.getMessage());
+            logger.error("비밀번호 확인 중 오류 발생: {}", e.getMessage());
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
+            errorResponse.put("message", "비밀번호 확인 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    
-   
+    // 어드민 정보 수정
+    @PatchMapping("/update")
+    public ResponseEntity<Map<String, Object>> updateAdminInfo(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody AdminUpdateDTO adminUpdateDTO) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "유효한 토큰이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
+        int adminId = jwtTokenProvider.getUserIdFromToken(token);
+        logger.info("어드민 정보 수정 요청한 토큰: {}", token);
+        logger.info("수정할 정보: {}", adminUpdateDTO);
+
+        try {
+            Map<String, Object> response = adminService.updateAdminInfo(adminId, adminUpdateDTO);
+            return ResponseEntity.status((HttpStatus) response.get("status")).body(response);
+        } catch (Exception e) {
+            logger.error("어드민 정보 수정 중 오류 발생: {}", e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "어드민 정보 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
 }

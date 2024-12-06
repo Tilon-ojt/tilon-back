@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -13,15 +16,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.tilon.ojt_back.controller.user.AdminController;
 import com.tilon.ojt_back.dao.user.AdminMapper;
 import com.tilon.ojt_back.domain.CustomUserDetails;
 import com.tilon.ojt_back.domain.user.AdminRequestDTO;
 import com.tilon.ojt_back.domain.user.AdminResponseDTO;
+import com.tilon.ojt_back.domain.user.AdminUpdateDTO;
 import com.tilon.ojt_back.domain.user.LoginDTO;
 import com.tilon.ojt_back.security.JwtTokenProvider;
 
 @Service
 public class AdminService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
     @Autowired
     private AdminMapper adminMapper;
 
@@ -123,7 +130,7 @@ public class AdminService {
         }
     }
 
-    //4. 비밀번호 초기화 
+    // 4. 비밀번호 초기화
 
     public ResponseEntity<Map<String, Object>> resetPassword(int adminId) {
         try {
@@ -137,7 +144,6 @@ public class AdminService {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "비밀번호가 성공적으로 초기화되었습니다.");
             response.put("adminId", adminId);
-           
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -146,24 +152,54 @@ public class AdminService {
                     .body(Collections.singletonMap("message", "비밀번호 초기화 중 오류가 발생했습니다."));
         }
     }
-    
-    // 5. 비밀번호 변경
-    public ResponseEntity<Map<String, Object>> changePassword(int adminId, String password) {
+
+    // 5. 비밀번호 동일성 체크
+
+    public Map<String, Object> checkPassword(int adminId, String newPassword) {
+        Map<String, Object> response = new HashMap<>();
         try {
-            // 새 비밀번호를 인코딩
-            String encodedPassword = passwordEncoder.encode(password);
+            String currentPassword = adminMapper.getCurrentPassword(adminId);
+            logger.info("현재 비밀번호: {}", currentPassword);
+            logger.info("새로운 비밀번호: {}", newPassword);
 
-            // 매퍼를 통해 비밀번호 업데이트
-            adminMapper.resetPassword(adminId, encodedPassword);
-
-            // 응답 데이터 구성
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
-            return ResponseEntity.ok(response);
+            // 암호화된 비밀번호와 평문 비밀번호 비교
+            if (passwordEncoder.matches(newPassword, currentPassword)) {
+                response.put("status", HttpStatus.OK);
+                response.put("message", "비밀번호가 일치합니다.");
+            } else {
+                response.put("status", HttpStatus.BAD_REQUEST);
+                response.put("message", "비밀번호가 일치하지 않습니다.");
+            }
         } catch (Exception e) {
-            e.printStackTrace(); // 예외 로그 출력
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "비밀번호 변경 중 오류가 발생했습니다."));
+            logger.error("비밀번호 확인 중 오류 발생: {}", e.getMessage());
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
+            response.put("message", "비밀번호 확인 중 오류가 발생했습니다.");
         }
+        return response;
     }
+
+    // 6. 계정 정보 수정
+    public Map<String, Object> updateAdminInfo(int adminId, AdminUpdateDTO adminUpdateDTO) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            adminUpdateDTO.setAdminId(adminId);
+
+            // 비밀번호 암호화
+            String encodedPassword = passwordEncoder.encode(adminUpdateDTO.getPassword());
+            adminUpdateDTO.setPassword(encodedPassword);
+
+            logger.info("adminUpdateDTO: adminId-{}, password-{}, nickname-{}", adminUpdateDTO.getAdminId(),
+                    adminUpdateDTO.getPassword(), adminUpdateDTO.getNickname());
+            adminMapper.updateAdminInfo(adminUpdateDTO);
+
+            response.put("status", HttpStatus.OK);
+            response.put("message", "어드민 정보가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            logger.error("어드민 정보 수정 중 오류 발생: {}", e.getMessage());
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
+            response.put("message", "어드민 정보 수정 중 오류가 발생했습니다.");
+        }
+        return response;
+    }
+
 }
