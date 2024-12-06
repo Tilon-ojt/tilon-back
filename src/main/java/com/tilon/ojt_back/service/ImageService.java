@@ -8,8 +8,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ImageService {
@@ -20,7 +22,7 @@ public class ImageService {
     @Value("${server.domain}")
     private String serverDomain;
 
-    public String uploadImage(MultipartFile file) throws IOException{
+    public String uploadImage(MultipartFile file){
         // 파일 이름 생성
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
@@ -35,7 +37,7 @@ public class ImageService {
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image", e);
         }
 
         // 파일 경로 반환
@@ -48,7 +50,7 @@ public class ImageService {
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete image", e);
         }
     }
 }

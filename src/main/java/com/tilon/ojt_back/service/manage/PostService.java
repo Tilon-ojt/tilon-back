@@ -22,23 +22,39 @@ public class PostService {
 
     // post 조회
     public List<PostResponseDTO> getPosts(PostCategory category) {
-        return postMapper.getPostsRow(category);
+        try {
+            return postMapper.getPostsRow(category);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to get posts", e);
+        }
     }
 
     // post 상세 조회
     public PostResponseDTO getPost(int postId) {
-        return postMapper.getPostRow(postId);
+        try {
+            return postMapper.getPostRow(postId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to get post", e);
+        }
     }
 
     // post 작성
     public void createPost(PostRequestDTO param) {
-        postMapper.createPostRow(param);
+        try {
+            postMapper.createPostRow(param);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create post", e);
+        }
     }
 
     // post 수정
     public void updatePost(int postId, PostRequestDTO param) {
-        param.setPostId(postId);
-        postMapper.updatePostRow(param);
+        try {
+            param.setPostId(postId);
+            postMapper.updatePostRow(param);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update post", e);
+        }
     }
 
     // post status 수정
@@ -56,7 +72,11 @@ public class PostService {
         param.put("status", status);
 
         if(presentFix == PostFix.NOT_FIX){
-            postMapper.updatePostStatusRow(param);
+            try {
+                postMapper.updatePostStatusRow(param);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update post status", e);
+            }
         } else if(presentFix == PostFix.FIX){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "고정 게시글은 상태 변경이 불가능합니다.");
         }
@@ -77,7 +97,11 @@ public class PostService {
         param.put("fix", fix);
 
         if(presentStatus == PostStatus.PUBLISHED){
-            postMapper.updatePostFixRow(param);
+            try {
+                postMapper.updatePostFixRow(param);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update post fix", e);
+            }
         } else if(presentStatus == PostStatus.DRAFT){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "게시글이 게시되어 있을 때만 고정 가능합니다.");
         }
@@ -85,6 +109,10 @@ public class PostService {
 
     // post 삭제
     public void deletePost(int postId) {
-        postMapper.deletePostRow(postId);
+        try {
+            postMapper.deletePostRow(postId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete post", e);
+        }
     }
 }

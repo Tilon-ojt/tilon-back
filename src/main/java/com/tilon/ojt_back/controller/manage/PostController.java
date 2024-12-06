@@ -1,7 +1,5 @@
 package com.tilon.ojt_back.controller.manage;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostFix;
 import com.tilon.ojt_back.domain.manage.PostRequestDTO;
-import com.tilon.ojt_back.domain.manage.PostResponseDTO;
 import com.tilon.ojt_back.domain.manage.PostStatus;
 import com.tilon.ojt_back.service.manage.PostService;
 
@@ -32,32 +29,48 @@ public class PostController {
 
     // post 조회
     @GetMapping("")
-    public ResponseEntity<List<PostResponseDTO>> getPosts(
+    public ResponseEntity<?> getPosts(
             @RequestParam(name = "category") PostCategory category) {
-        return ResponseEntity.ok(postService.getPosts(category));
+        try {
+            return ResponseEntity.ok(postService.getPosts(category));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 
     // post 상세 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponseDTO> getPost(@PathVariable int postId) {
-        return ResponseEntity.ok(postService.getPost(postId));
+    public ResponseEntity<?> getPost(@PathVariable int postId) {
+        try {
+            return ResponseEntity.ok(postService.getPost(postId));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 
     // post 작성
     @PostMapping("")
-    public ResponseEntity<Void> createPost(@RequestBody PostRequestDTO param) {
-        postService.createPost(param);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<?> createPost(@RequestBody PostRequestDTO param) {
+        try {
+            postService.createPost(param);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 
     // post 수정
     @PutMapping("/{postId}")
-    public ResponseEntity<Void> updatePost(
+    public ResponseEntity<?> updatePost(
             @PathVariable(name = "postId") int postId,
             @RequestBody PostRequestDTO param) {
 
-        postService.updatePost(postId, param);
-        return ResponseEntity.noContent().build();
+        try {
+            postService.updatePost(postId, param);
+            return ResponseEntity.noContent().build();
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 
     // post status 수정
@@ -90,8 +103,12 @@ public class PostController {
 
     // post 삭제
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable(name = "postId") int postId) {
-        postService.deletePost(postId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletePost(@PathVariable(name = "postId") int postId) {
+        try {
+            postService.deletePost(postId);
+            return ResponseEntity.noContent().build();
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 }
