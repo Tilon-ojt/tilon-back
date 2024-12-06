@@ -1,7 +1,6 @@
 package com.tilon.ojt_back.controller.homepage;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tilon.ojt_back.domain.manage.PostCategory;
-import com.tilon.ojt_back.domain.manage.PostResponseDTO;
 import com.tilon.ojt_back.service.homepage.UserService;
 
 @RestController
@@ -29,8 +27,7 @@ public class UserController {
         int size = 10;
         int offset = (page - 1) * size;
         try {
-            Page<PostResponseDTO> posts = userService.getPosts(category, offset, size);
-            return ResponseEntity.ok(posts.getContent());
+            return ResponseEntity.ok(userService.getPosts(category, offset, size));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
