@@ -30,9 +30,13 @@ public class PostController {
     // post 조회
     @GetMapping("")
     public ResponseEntity<?> getPosts(
-            @RequestParam(name = "category") PostCategory category) {
+            @RequestParam(name = "category") PostCategory category,
+            @RequestParam(name = "page") int page) {
+
+        int size = 10;
+        int offset = (page - 1) * size;
         try {
-            return ResponseEntity.ok(postService.getPosts(category));
+            return ResponseEntity.ok(postService.getPosts(category, offset, size));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }

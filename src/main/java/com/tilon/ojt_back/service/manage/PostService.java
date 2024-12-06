@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,9 +25,17 @@ public class PostService {
     @Autowired private PostMapper postMapper;
 
     // post 조회
-    public List<PostResponseDTO> getPosts(PostCategory category) {
+    public Page<PostResponseDTO> getPosts(PostCategory category, int offset, int size) {
         try {
-            return postMapper.getPostsRow(category);
+            Map<String, Object> param = new HashMap<>();
+            param.put("category", category);
+            param.put("offset", offset);
+            param.put("size", size);
+
+            List<PostResponseDTO> posts = postMapper.getPostsRow(param);
+            int pageNumber = offset / size;
+            Pageable pageable = PageRequest.of(pageNumber, size);
+            return new PageImpl<>(posts, pageable, postMapper.getPostsCountRow(category));
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to get posts", e);
         }
