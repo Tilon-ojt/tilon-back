@@ -64,4 +64,13 @@
      UPDATE admin SET password=#{password}, nickname=#{nickname} WHERE admin_id=#{adminId}
     </update>
 
+     <!-- 7. 여러 adminId를 한 번에 삭제하는 쿼리 -->
+    <delete id="deleteByAdminIds" parameterType="list">
+        DELETE FROM Admin
+        WHERE admin_id IN
+        <foreach item="id" collection="adminIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

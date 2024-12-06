@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tilon.ojt_back.controller.user.AdminController;
 import com.tilon.ojt_back.dao.user.AdminMapper;
@@ -198,6 +199,21 @@ public class AdminService {
             logger.error("어드민 정보 수정 중 오류 발생: {}", e.getMessage());
             response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
             response.put("message", "어드민 정보 수정 중 오류가 발생했습니다.");
+        }
+        return response;
+    }
+
+    // 7. 어드민 삭제
+
+    @Transactional
+    public Map<String, Object> deleteAdmins(List<Integer> adminIds) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            adminMapper.deleteByAdminIds(adminIds);
+            response.put("message", "어드민 삭제가 성공적으로 완료되었습니다.");
+        } catch (Exception e) {
+            logger.error("어드민 삭제 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("어드민 삭제 중 오류가 발생했습니다.");
         }
         return response;
     }

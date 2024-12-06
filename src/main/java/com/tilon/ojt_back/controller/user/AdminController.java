@@ -20,6 +20,7 @@ import com.tilon.ojt_back.domain.user.LoginDTO;
 import com.tilon.ojt_back.security.JwtTokenProvider;
 import com.tilon.ojt_back.service.user.AdminService;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -109,6 +110,25 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+    // 어드민 삭제
+    @DeleteMapping("/account")
+    public ResponseEntity<Map<String, Object>> deleteAdmins(@RequestBody Map<String, List<Integer>> payload) {
+        List<Integer> adminIds = payload.get("adminIds");
+        logger.info("삭제 요청 받은 어드민 ID 리스트: {}", adminIds);
+
+        try {
+            Map<String, Object> response = adminService.deleteAdmins(adminIds);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("어드민 삭제 중 오류 발생: {}", e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "어드민 삭제 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    // 3. admin 권한 필요
 
     // 비밀번호 동일성 확인
     @PostMapping("/check-password")
