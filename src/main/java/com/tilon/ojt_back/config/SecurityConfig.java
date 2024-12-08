@@ -46,7 +46,7 @@ public class SecurityConfig {
                             .hasAnyRole("SUPER_ADMIN", "ADMIN") // ADMIN과 SUPER_ADMIN
                             .requestMatchers("/admin/accounts").hasRole("SUPER_ADMIN") // SUPER_ADMIN만 접근 가능
                             // .requestMatchers("/admin/logout", "/admin/account").authenticated() // 인증된사용자
-                            .requestMatchers("/admin/update", "/admin/check-password").hasRole("ADMIN")
+                            .requestMatchers("/admin/update").hasRole("ADMIN")
                             .requestMatchers("/static/**").permitAll() // 정적 리소스 접근 허용
                             .anyRequest().permitAll(); // 나머지 요청은 허용
                     logger.info("Security configuration applied"); // 보안 설정 로그 추가

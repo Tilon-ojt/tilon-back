@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tilon.ojt_back.controller.user.AdminController;
+
 import com.tilon.ojt_back.dao.user.AdminMapper;
 import com.tilon.ojt_back.domain.CustomUserDetails;
 import com.tilon.ojt_back.domain.user.AdminRequestDTO;
@@ -117,7 +117,7 @@ public class AdminService {
             // 비밀번호 유효성 검사: 영어, 숫자 조합으로 6자 이상
             if (!isValidPassword(adminRequestDTO.getPassword())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Collections.singletonMap("message", "비밀번호는 영어와 숫자의 조합으로 6자 이상이어야 합니다."));
+                        .body(Collections.singletonMap("message", "비밀번호는 영어와 숫자의 조합으로 6자 이상이어야 합���다."));
             }
 
             // 비밀번호 암호화
@@ -146,7 +146,7 @@ public class AdminService {
 
     // empName 유효성 검사 메서드 추가
     private boolean isValidEmpName(String empName) {
-        return empName.matches("^[a-zA-Z]+$"); // 영어만 포함하는지 확인
+        return empName.matches("^[a-zA-Z]+$"); // 영어�� 포함하는지 확인
     }
 
     // 비밀번호 유효성 검사 메서드 추가
@@ -202,20 +202,36 @@ public class AdminService {
         return response;
     }
 
-    // 6. 계정 정보 수정
+    //6. 비밀번호 변경
     public Map<String, Object> updateAdminInfo(int adminId, AdminUpdateDTO adminUpdateDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
             adminUpdateDTO.setAdminId(adminId);
-
-            // 비밀���호 암호화
-            String encodedPassword = passwordEncoder.encode(adminUpdateDTO.getPassword());
-            adminUpdateDTO.setPassword(encodedPassword);
-
-            logger.info("adminUpdateDTO: adminId-{}, password-{}, nickname-{}", adminUpdateDTO.getAdminId(),
-                    adminUpdateDTO.getPassword(), adminUpdateDTO.getNickname());
-            adminMapper.updateAdminInfo(adminUpdateDTO);
-
+    
+            // 현재 비밀번호 가져오기
+            String currentPassword = adminMapper.getCurrentPassword(adminId);
+    
+            // 현재 비밀번호와 입력된 비밀번호 비교
+            if (!passwordEncoder.matches(adminUpdateDTO.getCurrentPassword(), currentPassword)) {
+                response.put("status", HttpStatus.BAD_REQUEST);
+                response.put("message", "현재 비밀번호가 일치하지 않습니다.");
+                return response;
+            }
+    
+            // 새 비밀번호 검증
+            if (!isValidPassword(adminUpdateDTO.getNewPassword())) {
+                response.put("status", HttpStatus.BAD_REQUEST);
+                response.put("message", "비밀번호는 영문자와 숫자의 조합으로 6자 이상이어야 합니다.");
+                return response;
+            }
+    
+            // 새 비밀번호 암호화
+            String encodedPassword = passwordEncoder.encode(adminUpdateDTO.getNewPassword());
+            adminUpdateDTO.setNewPassword(encodedPassword);
+    
+            logger.info("adminUpdateDTO: adminId-{}, newPassword-{}", adminUpdateDTO.getAdminId(), adminUpdateDTO.getNewPassword());
+            adminMapper.updatePassword(adminUpdateDTO);
+    
             response.put("status", HttpStatus.OK);
             response.put("message", "어드민 정보가 성공적으로 수정되었습니다.");
         } catch (Exception e) {
@@ -242,3 +258,4 @@ public class AdminService {
     }
 
 }
+

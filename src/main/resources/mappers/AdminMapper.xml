@@ -54,7 +54,7 @@
         WHERE admin_id = #{adminId}
     </update>
 
-    <!-- 5. 비밀번호 동일성 체크-->
+    <!-- 5. 비밀번호 동일성 체크 아이디로 비밀번호 조회-->
     <select id="getCurrentPassword" parameterType="int" resultType="string">
       SELECT password FROM admin WHERE admin_id = #{adminId}
     </select>
@@ -72,5 +72,12 @@
             #{id}
         </foreach>
     </delete>
+
+       <!-- 8. 비밀번호 변경 쿼리 -->
+    <update id="updatePassword" parameterType="com.tilon.ojt_back.domain.user.AdminUpdateDTO">
+        UPDATE admin
+        SET password = #{newPassword}
+        WHERE admin_id = #{adminId} 
+    </update>
 
 </mapper>

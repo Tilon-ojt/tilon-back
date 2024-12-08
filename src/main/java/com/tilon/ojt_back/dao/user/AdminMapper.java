@@ -36,4 +36,7 @@ public interface AdminMapper {
     // 7. 여러 계정 한번에 삭제
     void deleteByAdminIds(@Param("adminIds") List<Integer> adminIds);
 
+    // 8. 비밀번호 변경 메서드
+    int updatePassword(AdminUpdateDTO adminUpdateDTO);
+
 }

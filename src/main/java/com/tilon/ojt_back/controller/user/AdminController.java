@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tilon.ojt_back.domain.user.AdminRequestDTO;
 import com.tilon.ojt_back.domain.user.AdminResponseDTO;
 import com.tilon.ojt_back.domain.user.AdminUpdateDTO;
-import com.tilon.ojt_back.domain.user.LoginDTO;
 import com.tilon.ojt_back.security.JwtTokenProvider;
 import com.tilon.ojt_back.service.user.AdminService;
 
@@ -130,35 +129,8 @@ public class AdminController {
 
     // 3. admin 권한 필요
 
-    // 비밀번호 동일성 확인
-    @PostMapping("/check-password")
-    public ResponseEntity<Map<String, Object>> checkPassword(
-            @RequestHeader("Authorization") String authorizationHeader,
-            @RequestBody AdminUpdateDTO adminUpdateDTO) {
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "유효한 토큰이 필요합니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
 
-        String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
-        int adminId = jwtTokenProvider.getUserIdFromToken(token);
-        String newPassword = adminUpdateDTO.getPassword();
-        logger.info("비밀번호 유효성 요청한 토큰: {}", token);
-        logger.info("요청한 비밀번호: {}", newPassword);
-
-        try {
-            Map<String, Object> response = adminService.checkPassword(adminId, newPassword);
-            return ResponseEntity.status((HttpStatus) response.get("status")).body(response);
-        } catch (Exception e) {
-            logger.error("비밀번호 확인 중 오류 발생: {}", e.getMessage());
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "비밀번호 확인 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
-    }
-
-    // 어드민 정보 수정
+    // 어드민 비밀번호 변경 
     @PatchMapping("/update")
     public ResponseEntity<Map<String, Object>> updateAdminInfo(
             @RequestHeader("Authorization") String authorizationHeader,
