@@ -103,14 +103,18 @@ public class AdminService {
             // 어드민 존재 여부 확인
             AdminResponseDTO existingAdmin = adminMapper.getUserByEmpName(adminRequestDTO.getEmpName());
             if (existingAdmin != null) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(Collections.singletonMap("message", "이미 존재하는 어드민입니다."));
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "이미 존재하는 어드민입니다.");
+                response.put("status", HttpStatus.CONFLICT.value());
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             }
 
             // empName 유효성 검사: 영어만 가능
             if (!isValidEmpName(adminRequestDTO.getEmpName())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Collections.singletonMap("message", "empName은 영어와 숫자만 포함해야 합니다."));
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "empName은 영어와 숫자만 포함해야 합니다.");
+                response.put("status", HttpStatus.BAD_REQUEST.value());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             // 비밀번호가 null인 경우 디폴트 비밀번호 사용
@@ -119,8 +123,10 @@ public class AdminService {
 
             // 비밀번호 유효성 검사: 영어, 숫자 조합으로 6자 이상
             if (!isValidPassword(passwordToUse)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Collections.singletonMap("message", "비밀번호는 영어와 숫자의 조합으로 6자 이상이어야 합니다."));
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "비밀번호는 영어와 숫자의 조합으로 6자 이상이어야 합니다.");
+                response.put("status", HttpStatus.BAD_REQUEST.value());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             // 비밀번호 암호화
@@ -138,12 +144,15 @@ public class AdminService {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "어드민이 성공적으로 등록되었습니다.");
             response.put("admin", newAdmin);
+            response.put("status", HttpStatus.CREATED.value());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             e.printStackTrace(); // 예외 로그 출력
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "어드민 등록 중 오류가 발생했습니다."));
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "어드민 등록 중 오류가 발생했습니다.");
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
