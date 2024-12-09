@@ -118,7 +118,7 @@ public class AdminService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
-            // 비밀번호가 null인 경우 디폴트 비밀번호 사용
+            // 비밀번호가 null인 경��� 디폴트 비밀번호 사용
             String passwordToUse = adminRequestDTO.getPassword() != null ? adminRequestDTO.getPassword()
                     : DEFAULT_PASSWORD;
 
@@ -272,7 +272,7 @@ public class AdminService {
         int userId = jwtTokenProvider.getUserIdFromToken(token);
         String userRole = jwtTokenProvider.getUserRoleFromToken(token); // 역할 추출
 
-        logger.info("삭제 요청을 받은 어드�� id 리스트와 요청한 사용자 ID : {}, {}", adminIds, userId);
+        logger.info("삭제 요청을 받은 어드민 id 리스트와 요청한 사용자 ID : {}, {}", adminIds, userId);
         logger.info("사용자 역할 : {}", userRole);
 
         try {
@@ -283,14 +283,13 @@ public class AdminService {
                     response.put("status", HttpStatus.FORBIDDEN);
                     return response;
                 }
+                // ADMIN이 본인 계정을 삭제할 때만 토큰 무효화
+                jwtTokenProvider.invalidateToken(token);
             }
             // SUPER_ADMIN은 모든 ID 삭제 가능
             adminMapper.deleteByAdminIds(adminIds);
             response.put("message", "어드민 삭제가 성공적으로 완료되었습니다.");
             response.put("status", HttpStatus.OK);
-
-            // 토큰을 랙리스트에 추가하여 무효화
-            jwtTokenProvider.invalidateToken(token);
 
         } catch (Exception e) {
             logger.error("어드민 삭제 중 오류 발생: {}", e.getMessage());
