@@ -21,6 +21,8 @@ import com.tilon.ojt_back.domain.manage.PostRequestDTO;
 import com.tilon.ojt_back.domain.manage.PostStatus;
 import com.tilon.ojt_back.service.manage.PostService;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/admin/posts")
 public class PostController {
@@ -52,11 +54,21 @@ public class PostController {
         }
     }
 
+    // post 작성 시 임시 postId 생성
+    @PostMapping("/start")
+    public ResponseEntity<String> startPostCreation() {
+        // 서버에서 tempPostId 생성
+        String tempPostId = postService.startPostCreation();
+        return ResponseEntity.ok().body(tempPostId);
+    }
+
     // post 작성
     @PostMapping("")
-    public ResponseEntity<?> createPost(@RequestBody PostRequestDTO param) {
+    public ResponseEntity<?> createPost(
+            @RequestBody PostRequestDTO param,
+            @RequestParam(name = "tempPostId") String tempPostId) {
         try {
-            postService.createPost(param);
+            postService.createPost(param, tempPostId);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());

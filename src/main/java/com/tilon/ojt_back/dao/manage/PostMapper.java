@@ -25,6 +25,9 @@ public interface PostMapper {
     // post 작성
     public void createPostRow(PostRequestDTO param);
 
+    // 최신 postId 조회
+    public int getLatestPostIdRow();
+
     // post 수정
     public void updatePostRow(PostRequestDTO param);
 
