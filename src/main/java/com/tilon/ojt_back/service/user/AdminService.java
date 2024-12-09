@@ -64,7 +64,7 @@ public class AdminService {
 
             if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 // 로그 추가: 비밀번호 불일치
-                System.out.println("비밀번호  불일치: " + loginDTO.getEmpName());
+                System.out.println("비밀번호 불일치: " + loginDTO.getEmpName());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
             }
@@ -118,7 +118,7 @@ public class AdminService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
-            // 비밀번��가 null인 경우 디폴트 비밀번호 사용
+            // 비밀번호가 null인 경우 디폴트 비밀번호 사용
             String passwordToUse = adminRequestDTO.getPassword() != null ? adminRequestDTO.getPassword()
                     : DEFAULT_PASSWORD;
 
@@ -216,10 +216,17 @@ public class AdminService {
     }
 
     // 6. 비밀번호 변경
-    public ResponseEntity<Map<String, Object>> updateAdminInfo(int adminId, AdminUpdateDTO adminUpdateDTO) {
+    public ResponseEntity<Map<String, Object>> updateAdminInfo(AdminUpdateDTO adminUpdateDTO, String token) {
         Map<String, Object> response = new HashMap<>();
         try {
+            int adminId = jwtTokenProvider.getUserIdFromToken(token); // 토큰에서 ID 추출
+            String userRole = jwtTokenProvider.getUserRoleFromToken(token); // 역할 추출
             adminUpdateDTO.setAdminId(adminId);
+
+            if ("ROLE_SUPER_ADMIN".equals(userRole)) {
+                response.put("message", "SUPER_ADMIN은 비밀번호를 변경할 수 없습니다.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            }
 
             // 현재 비밀번호 가져오기
             String currentPassword = adminMapper.getCurrentPassword(adminId);
@@ -252,7 +259,7 @@ public class AdminService {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             logger.error("어드민 정보 수정 중 오류 발생: {}", e.getMessage());
-            response.put("message", "어드민 정보 수정 중 오류��� 발생했습니다.");
+            response.put("message", "어드민 정보 수정 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -265,7 +272,7 @@ public class AdminService {
         int userId = jwtTokenProvider.getUserIdFromToken(token);
         String userRole = jwtTokenProvider.getUserRoleFromToken(token); // 역할 추출
 
-        logger.info("삭제 요청을 받은 어드민 id 리스트와 요청한 사용자 ID : {}, {}", adminIds, userId);
+        logger.info("삭제 요청을 받은 어드�� id 리스트와 요청한 사용자 ID : {}, {}", adminIds, userId);
         logger.info("사용자 역할 : {}", userRole);
 
         try {
