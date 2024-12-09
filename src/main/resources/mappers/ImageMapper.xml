@@ -6,8 +6,8 @@
 
     <!-- 이미지 저장 -->
     <insert id="insertImageRow" parameterType="java.util.Map">
-        INSERT INTO postimages (temp_post_id, file_name, file_path)
-        VALUES (#{tempPostId}, #{fileName}, #{filePath})
+        INSERT INTO postimages (post_id, temp_post_id, file_name, file_path)
+        VALUES (#{postId}, #{tempPostId}, #{fileName}, #{filePath})
     </insert>
 
     <!-- 임시 postId를 실제 postId로 업데이트 -->

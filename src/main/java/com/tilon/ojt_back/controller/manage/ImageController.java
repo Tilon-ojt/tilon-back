@@ -21,10 +21,11 @@ public class ImageController {
     @PostMapping("upload")
     public ResponseEntity<String> uploadImage(
         @RequestParam("ImgFile") MultipartFile file,
-        @RequestParam("tempPostId") String tempPostId) {
+        @RequestParam(value = "postId", required = false) Integer postId,
+        @RequestParam(value = "tempPostId", required = false) String tempPostId) {
         try {
             // 이미지 업로드
-            String imageUrl = imageService.uploadImage(file, tempPostId);
+            String imageUrl = imageService.uploadImage(file, tempPostId, postId);
 
             // CKEditor에 이미지 URL 반환
             return ResponseEntity.ok(imageUrl);

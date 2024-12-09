@@ -30,7 +30,7 @@ public class ImageService {
     @Value("${server.domain}")
     private String serverDomain;
 
-    public String uploadImage(MultipartFile file, String tempPostId){
+    public String uploadImage(MultipartFile file, String tempPostId, Integer postId){
         // 파일 이름 생성
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
@@ -41,15 +41,34 @@ public class ImageService {
             filePath.getParent().toFile().mkdirs();
         }
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("tempPostId", tempPostId);
-        param.put("fileName", fileName);
-        param.put("filePath", filePath.toString());
+        // postId로 이미지 저장 (post 수정시)
+        if (postId != null) {
+            Map<String, Object> param = new HashMap<>();
+            param.put("postId", postId);
+            param.put("fileName", fileName);
+            param.put("filePath", filePath.toString());
+            try {
+                imageMapper.insertImageRow(param);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to insert image", e);
+            }
+        } 
+        // tempPostId로 이미지 저장 (post 작성시)
+        else if (tempPostId != null) {
+            Map<String, Object> param = new HashMap<>();
+            param.put("tempPostId", tempPostId);
+            param.put("fileName", fileName);
+            param.put("filePath", filePath.toString());
+            try {
+                //DB에 fileName, filePath 저장
+                imageMapper.insertImageRow(param);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to insert image", e);
+            }
+        }
 
+        // 서버에 이미지 저장
         try {
-            //DB에 fileName, filePath 저장
-            imageMapper.insertImageRow(param);
-            // 서버에 이미지 저장
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image", e);
