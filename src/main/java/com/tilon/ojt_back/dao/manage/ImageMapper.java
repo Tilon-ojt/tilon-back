@@ -11,4 +11,7 @@ public interface ImageMapper {
 
     // 임시 postId를 실제 postId로 업데이트
     public void updatePostIdForImageRow(Map<String, Object> param);
+
+    // 이미지 삭제
+    public void deleteImageRow(String fileName);
 }

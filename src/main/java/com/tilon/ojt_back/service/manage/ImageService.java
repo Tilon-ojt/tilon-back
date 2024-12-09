@@ -78,6 +78,7 @@ public class ImageService {
         Path filePath = Paths.get(uploadPath, fileName);
         try {
             Files.deleteIfExists(filePath);
+            imageMapper.deleteImageRow(fileName);
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete image", e);
         }

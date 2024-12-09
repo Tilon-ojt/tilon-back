@@ -16,4 +16,10 @@
         SET post_id = #{postId}
         WHERE temp_post_id = #{tempPostId}
     </update>
+
+    <!-- 이미지 삭제 -->
+    <delete id="deleteImageRow" parameterType="java.lang.String">
+        DELETE FROM postimages
+        WHERE file_name = #{fileName}
+    </delete>
 </mapper>
