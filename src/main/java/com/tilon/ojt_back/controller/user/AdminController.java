@@ -86,24 +86,39 @@ public class AdminController {
 
     // 어드민 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logoutAdmin(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<Map<String, Object>> logoutAdmin(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestHeader("Refresh-Token") String refreshTokenHeader) {
+
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "유효한 토큰이 필요합니다.");
+            errorResponse.put("message", "유효한 액세스 토큰이 필요합니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
-        String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
-        logger.info("로그아웃을 요청한 토큰: {}", token);
+        if (refreshTokenHeader == null) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "유효한 리프레시 토큰이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        String accessToken = authorizationHeader.substring(7); // "Bearer " 이후의 액세스 토큰 추출
+        logger.info("로그아웃을 요청한 액세스 토큰: {}", accessToken);
+        logger.info("로그아웃을 요청한 리프레시 토큰: {}", refreshTokenHeader);
+
         try {
-            jwtTokenProvider.invalidateToken(token);
+            // 액세스 토큰 무효화
+            jwtTokenProvider.invalidateToken(accessToken);
+
+            // 리프레시 토큰 무효화
+            jwtTokenProvider.invalidateToken(refreshTokenHeader);
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "성공적으로 로그아웃되었습니다.");
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error during admin logout: {}", e.getMessage());
+            logger.error("로그아웃 중 오류 발생: {}", e.getMessage());
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("message", "로그아웃 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);

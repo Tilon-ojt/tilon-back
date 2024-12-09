@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Access 토큰이 아니거나 만료된 경우
         try {
             if (!jwtTokenProvider.isAccessToken(token) || jwtTokenProvider.isExpired(token)) {
-                logger.warn("유효하지 않거나 만료된 토��: {}", token);
+                logger.warn("유효하지 않거나 만료된 토큰: {}", token);
                 errorResponse(response);
                 return;
             }

@@ -77,13 +77,15 @@ public class AdminService {
                     new ArrayList<>(),
                     user.getRole());
 
-            String token = jwtTokenProvider.createAccessToken(userDetails);
+            String accessToken = jwtTokenProvider.createAccessToken(userDetails);
+            String refreshToken = jwtTokenProvider.createRefreshToken(userDetails);
 
             // 로그 추가: 토큰 생성 성공
             System.out.println("토큰 생성 성공: " + user.getEmpName());
 
             Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", refreshToken);
             response.put("adminId", user.getAdminId());
             response.put("role", user.getRole());
             response.put("empName", user.getEmpName());
