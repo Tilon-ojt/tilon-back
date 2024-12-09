@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tilon.ojt_back.dao.manage.ImageMapper">
+
+    <!-- 이미지 저장 -->
+    <insert id="insertImageRow" parameterType="java.util.Map">
+        INSERT INTO postimages (temp_post_id, file_name, file_path)
+        VALUES (#{tempPostId}, #{fileName}, #{filePath})
+    </insert>
+
+    <!-- 임시 postId를 실제 postId로 업데이트 -->
+    <update id="updatePostIdForImageRow" parameterType="java.util.Map">
+        UPDATE postimages
+        SET post_id = #{postId}
+        WHERE temp_post_id = #{tempPostId}
+    </update>
+
+    <!-- 이미지 삭제 -->
+    <delete id="deleteImageRow" parameterType="java.lang.String">
+        DELETE FROM postimages
+        WHERE file_name = #{fileName}
+    </delete>
+</mapper>

@@ -1,12 +1,11 @@
 package com.tilon.ojt_back.domain.manage;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.Data;
 
 @Data
 public class PostRequestDTO {
-    private int postId;
+    private Integer postId;
     private String title;
     private String content;
     private PostCategory category;

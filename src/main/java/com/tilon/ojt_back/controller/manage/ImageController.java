@@ -19,10 +19,12 @@ public class ImageController {
 
     // 이미지 업로드
     @PostMapping("upload")
-    public ResponseEntity<String> uploadImage(@RequestParam("ImgFile") MultipartFile file) {
+    public ResponseEntity<String> uploadImage(
+        @RequestParam("ImgFile") MultipartFile file,
+        @RequestParam("tempPostId") String tempPostId) {
         try {
             // 이미지 업로드
-            String imageUrl = imageService.uploadImage(file);
+            String imageUrl = imageService.uploadImage(file, tempPostId);
 
             // CKEditor에 이미지 URL 반환
             return ResponseEntity.ok(imageUrl);

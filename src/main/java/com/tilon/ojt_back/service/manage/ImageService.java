@@ -5,16 +5,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.tilon.ojt_back.dao.manage.ImageMapper;
+
 @Service
 public class ImageService {
+    @Autowired
+    private ImageMapper imageMapper;
 
     @Value("${image.upload.path}")
     private String uploadPath;
@@ -22,7 +29,7 @@ public class ImageService {
     @Value("${server.domain}")
     private String serverDomain;
 
-    public String uploadImage(MultipartFile file){
+    public String uploadImage(MultipartFile file, String tempPostId){
         // 파일 이름 생성
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
@@ -33,8 +40,15 @@ public class ImageService {
             filePath.getParent().toFile().mkdirs();
         }
 
-        // 서버에 파일 저장
+        Map<String, Object> param = new HashMap<>();
+        param.put("tempPostId", tempPostId);
+        param.put("fileName", fileName);
+        param.put("filePath", filePath.toString());
+
         try {
+            //DB에 fileName, filePath 저장
+            imageMapper.insertImageRow(param);
+            // 서버에 이미지 저장
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image", e);
@@ -44,11 +58,27 @@ public class ImageService {
         return serverDomain + "/static/image/" + fileName;
     }
 
+    // 임시 postId를 실제 postId로 업데이트
+    public void updatePostIdForImage(String tempPostId, int postId){
+        System.out.println("ImageService.updatePostIdForImage() - tempPostId: " + tempPostId);
+        System.out.println("ImageService.updatePostIdForImage() - postId: " + postId);
+        Map<String, Object> param = new HashMap<>();
+        param.put("tempPostId", tempPostId);
+        param.put("postId", postId);
+        try {
+            System.out.println("ImageService.updatePostIdForImage() - param: " + param);
+            imageMapper.updatePostIdForImageRow(param);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update postId for image", e);
+        }
+    }
+
     // 이미지 삭제
     public void deleteImage(String fileName) {
         Path filePath = Paths.get(uploadPath, fileName);
         try {
             Files.deleteIfExists(filePath);
+            imageMapper.deleteImageRow(fileName);
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete image", e);
         }
