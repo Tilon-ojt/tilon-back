@@ -67,8 +67,6 @@ public class PostController {
     public ResponseEntity<?> createPost(
             @RequestBody PostRequestDTO param,
             @RequestParam(name = "tempPostId") String tempPostId) {
-        System.out.println("PostController.createPost() - tempPostId: " + tempPostId);
-        System.out.println("PostController.createPost() - param: " + param);
         try {
             postService.createPost(param, tempPostId);
             return ResponseEntity.status(HttpStatus.CREATED).build();

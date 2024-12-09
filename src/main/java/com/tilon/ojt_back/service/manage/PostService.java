@@ -59,19 +59,14 @@ public class PostService {
 
     // post 작성
     public void createPost(PostRequestDTO param, String tempPostId) {
-        System.out.println("PostService.createPost() - tempPostId: " + tempPostId);
-        System.out.println("PostService.createPost() - param: " + param);
-
         // post 작성
         postMapper.createPostRow(param);
         // 최신 postId 조회
         int postId = postMapper.getLatestPostIdRow();
-        System.out.println("PostService.createPost() - postId: " + postId);
         try {
             // 임시 postId를 실제 postId로 업데이트
             imageService.updatePostIdForImage(tempPostId, postId);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create post", e);
         }
     }

@@ -60,13 +60,10 @@ public class ImageService {
 
     // 임시 postId를 실제 postId로 업데이트
     public void updatePostIdForImage(String tempPostId, int postId){
-        System.out.println("ImageService.updatePostIdForImage() - tempPostId: " + tempPostId);
-        System.out.println("ImageService.updatePostIdForImage() - postId: " + postId);
         Map<String, Object> param = new HashMap<>();
         param.put("tempPostId", tempPostId);
         param.put("postId", postId);
         try {
-            System.out.println("ImageService.updatePostIdForImage() - param: " + param);
             imageMapper.updatePostIdForImageRow(param);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update postId for image", e);
