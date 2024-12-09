@@ -29,7 +29,7 @@ public class ImageService {
     @Value("${server.domain}")
     private String serverDomain;
 
-    public String uploadImage(MultipartFile file, int postId){
+    public String uploadImage(MultipartFile file, String tempPostId){
         // 파일 이름 생성
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
@@ -41,7 +41,7 @@ public class ImageService {
         }
 
         Map<String, Object> param = new HashMap<>();
-        param.put("postId", postId);
+        param.put("tempPostId", tempPostId);
         param.put("fileName", fileName);
         param.put("filePath", filePath.toString());
 
@@ -56,6 +56,21 @@ public class ImageService {
 
         // 파일 경로 반환
         return serverDomain + "/static/image/" + fileName;
+    }
+
+    // 임시 postId를 실제 postId로 업데이트
+    public void updatePostIdForImage(String tempPostId, int postId){
+        System.out.println("ImageService.updatePostIdForImage() - tempPostId: " + tempPostId);
+        System.out.println("ImageService.updatePostIdForImage() - postId: " + postId);
+        Map<String, Object> param = new HashMap<>();
+        param.put("tempPostId", tempPostId);
+        param.put("postId", postId);
+        try {
+            System.out.println("ImageService.updatePostIdForImage() - param: " + param);
+            imageMapper.updatePostIdForImageRow(param);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update postId for image", e);
+        }
     }
 
     // 이미지 삭제

@@ -3,6 +3,7 @@ package com.tilon.ojt_back.service.manage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import com.tilon.ojt_back.domain.manage.PostFix;
 @Service
 public class PostService {
     @Autowired private PostMapper postMapper;
+    @Autowired private ImageService imageService;
 
     // post 조회
     public Page<PostResponseDTO> getPosts(PostCategory category, int offset, int size) {
@@ -50,11 +52,26 @@ public class PostService {
         }
     }
 
+    // post 작성 시 임시 postId 생성
+    public String startPostCreation() {
+        return UUID.randomUUID().toString();
+    }
+
     // post 작성
-    public void createPost(PostRequestDTO param) {
+    public void createPost(PostRequestDTO param, String tempPostId) {
+        System.out.println("PostService.createPost() - tempPostId: " + tempPostId);
+        System.out.println("PostService.createPost() - param: " + param);
+
+        // post 작성
+        postMapper.createPostRow(param);
+        // 최신 postId 조회
+        int postId = postMapper.getLatestPostIdRow();
+        System.out.println("PostService.createPost() - postId: " + postId);
         try {
-            postMapper.createPostRow(param);
+            // 임시 postId를 실제 postId로 업데이트
+            imageService.updatePostIdForImage(tempPostId, postId);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create post", e);
         }
     }

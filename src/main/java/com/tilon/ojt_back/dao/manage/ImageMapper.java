@@ -8,4 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface ImageMapper {
     // 이미지 저장
     public void insertImageRow(Map<String, Object> param);
+
+    // 임시 postId를 실제 postId로 업데이트
+    public void updatePostIdForImageRow(Map<String, Object> param);
 }

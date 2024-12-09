@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,13 +18,13 @@ public class ImageController {
     @Autowired private ImageService imageService;
 
     // 이미지 업로드
-    @PostMapping("upload/{postId}")
+    @PostMapping("upload")
     public ResponseEntity<String> uploadImage(
         @RequestParam("ImgFile") MultipartFile file,
-        @PathVariable("postId") int postId) {
+        @RequestParam("tempPostId") String tempPostId) {
         try {
             // 이미지 업로드
-            String imageUrl = imageService.uploadImage(file, postId);
+            String imageUrl = imageService.uploadImage(file, tempPostId);
 
             // CKEditor에 이미지 URL 반환
             return ResponseEntity.ok(imageUrl);

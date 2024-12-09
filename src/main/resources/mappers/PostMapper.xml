@@ -40,6 +40,12 @@
         VALUES (#{title}, #{content}, #{category}, #{adminId}, #{link});
     </insert>
 
+    <!-- 최신 postId 조회 -->
+    <select id="getLatestPostIdRow"
+            resultType="int">
+        SELECT LAST_INSERT_ID()
+    </select>
+
     <!-- post 수정 -->
     <update id="updatePostRow"
             parameterType="com.tilon.ojt_back.domain.manage.PostRequestDTO">
