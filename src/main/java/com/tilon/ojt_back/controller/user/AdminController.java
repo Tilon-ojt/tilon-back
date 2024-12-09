@@ -68,7 +68,7 @@ public class AdminController {
 
     // 계정 비밀번호 초기화
     @PutMapping("/accounts/{adminId}/reset-password")
-    public ResponseEntity<Map<String, Object>> resetPassword(@PathVariable int adminId) {
+    public ResponseEntity<Map<String, Object>> resetPassword(@PathVariable(name = "adminId") int adminId) {
         logger.info("비밀번호 리셋할 어드민 아이디: {}", adminId);
         try {
             // 비밀번호 초기화 요청을 서비스에 전달
@@ -129,8 +129,7 @@ public class AdminController {
 
     // 3. admin 권한 필요
 
-
-    // 어드민 비밀번호 변경 
+    // 어드민 비밀번호 변경
     @PatchMapping("/update")
     public ResponseEntity<Map<String, Object>> updateAdminInfo(
             @RequestHeader("Authorization") String authorizationHeader,
