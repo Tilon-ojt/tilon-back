@@ -22,4 +22,13 @@
         DELETE FROM postimages
         WHERE file_name = #{fileName}
     </delete>
+
+    <!-- postId로 file_name 조회 -->
+    <select id="selectFileNameByPostIdRow"
+            parameterType="java.lang.Integer"
+        resultType="java.lang.String">
+        SELECT file_name
+        FROM postimages
+        WHERE post_id = #{postId}
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.tilon.ojt_back.dao.manage;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -12,6 +13,9 @@ public interface ImageMapper {
     // 임시 postId를 실제 postId로 업데이트
     public void updatePostIdForImageRow(Map<String, Object> param);
 
-    // 이미지 삭제
+    // fileName으로 이미지 삭제
     public void deleteImageRow(String fileName);
+
+    // postId로 file_name 조회
+    public List<String> selectFileNameByPostIdRow(int postId);
 }

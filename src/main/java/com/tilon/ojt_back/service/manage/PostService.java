@@ -134,6 +134,9 @@ public class PostService {
     // post 삭제
     public void deletePost(int postId) {
         try {
+            // 서버에서 이미지 삭제
+            imageService.deleteImageByPostId(postId);
+            // post 삭제
             postMapper.deletePostRow(postId);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete post", e);

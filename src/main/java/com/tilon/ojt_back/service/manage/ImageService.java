@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,14 +71,24 @@ public class ImageService {
         }
     }
 
-    // 이미지 삭제
+    // fileName으로 이미지 삭제
     public void deleteImage(String fileName) {
         Path filePath = Paths.get(uploadPath, fileName);
         try {
+            // 서버에서 이미지 삭제
             Files.deleteIfExists(filePath);
+            // DB에서 이미지 삭제
             imageMapper.deleteImageRow(fileName);
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete image", e);
+        }
+    }
+
+    // postId로 서버에서 이미지 삭제
+    public void deleteImageByPostId(int postId) {
+        List<String> fileNames = imageMapper.selectFileNameByPostIdRow(postId);
+        for (String fileName : fileNames) {
+            deleteImage(fileName);
         }
     }
 }
