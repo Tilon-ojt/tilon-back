@@ -113,6 +113,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        // 리프레시 토큰 검증 및 재발급
+        if (requestURI.equals("/admin/refresh-token")) {
+            String refreshToken = request.getHeader("Refresh-Token");
+            if (refreshToken != null && jwtTokenProvider.validateRefreshToken(refreshToken)) {
+                CustomUserDetails refreshUserDetails = jwtTokenProvider.getUserDetailsFromToken(refreshToken);
+                String newAccessToken = jwtTokenProvider.createAccessToken(refreshUserDetails);
+                response.setHeader("Access-Token", newAccessToken);
+                logger.info("새로운 액세스 토큰 발급: {}", newAccessToken);
+            } else {
+                logger.warn("유효하지 않은 리프레시 토큰: {}", refreshToken);
+                errorResponse(response, "유효하지 않은 리프레시 토큰입니다.");
+                return;
+            }
+        }
+
         // 인증 토큰 생성 및 SecurityContext 설정
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());

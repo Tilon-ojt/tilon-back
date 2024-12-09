@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.tilon.ojt_back.service.TokenService;
 
 @Component
 public class JwtTokenProvider {
@@ -30,10 +32,16 @@ public class JwtTokenProvider {
     private String SECRET_KEY; // 인스턴스 필드로 변경
 
     // Access Token 만료 시간
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 6 * 60 * 60 * 1000L; // 6시간
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 60 * 60 * 1000L; // 1시간
+
+    // Refresh Token 만료 시간
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 12 * 60 * 60 * 1000L; // 12시간
 
     // 만료된 토큰을 저장할 블랙리스트
     private Set<String> blacklist = ConcurrentHashMap.newKeySet();
+
+    @Autowired
+    private TokenService tokenService;
 
     // Access Token 발급
     public String createAccessToken(CustomUserDetails userDetails) {
@@ -140,5 +148,26 @@ public class JwtTokenProvider {
         Claims claims = extractClaims(token);
         logger.info("Extracted role from token: {}", claims.get("role")); // 역할 로그 추가
         return claims.get("role", String.class); // 클레임에서 역할 가져옴
+    }
+
+    // 리프레시 토큰 생성
+    public String createRefreshToken(CustomUserDetails userDetails) {
+        String refreshToken = createToken(userDetails, REFRESH_TOKEN_EXPIRE_TIME, "refresh");
+        tokenService.saveRefreshToken(String.valueOf(userDetails.getAdminId()), refreshToken);
+        return refreshToken;
+    }
+
+    // 리프레시 토큰 검증
+    public boolean validateRefreshToken(String token) {
+        try {
+            return !isExpired(token) && isRefreshToken(token);
+        } catch (TokenValidationException e) {
+            logger.error("리프레시 토큰 검증 중 오류 발생: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean isRefreshToken(String token) {
+        return "refresh".equals(extractClaims(token).get("tokenType", String.class));
     }
 }
