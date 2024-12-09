@@ -113,14 +113,18 @@ public class AdminService {
                         .body(Collections.singletonMap("message", "empName은 영어와 숫자만 포함해야 합니다."));
             }
 
+            // 비밀번호가 null인 경우 디폴트 비밀번호 사용
+            String passwordToUse = adminRequestDTO.getPassword() != null ? adminRequestDTO.getPassword()
+                    : DEFAULT_PASSWORD;
+
             // 비밀번호 유효성 검사: 영어, 숫자 조합으로 6자 이상
-            if (!isValidPassword(adminRequestDTO.getPassword())) {
+            if (!isValidPassword(passwordToUse)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Collections.singletonMap("message", "비밀번호는 영어와 숫자의 조합으로 6자 이상이어야 합니다."));
             }
 
             // 비밀번호 암호화
-            String encodedPassword = passwordEncoder.encode(adminRequestDTO.getPassword());
+            String encodedPassword = passwordEncoder.encode(passwordToUse);
             adminRequestDTO.setPassword(encodedPassword);
 
             // 매퍼를 통해 어드민 등록
@@ -207,7 +211,7 @@ public class AdminService {
         try {
             adminUpdateDTO.setAdminId(adminId);
 
-            // 현재 ��밀번호 가져오기
+            // 현재 밀번호 가져오기
             String currentPassword = adminMapper.getCurrentPassword(adminId);
 
             // 현재 비밀번호와 입력된 비밀번호 비교
