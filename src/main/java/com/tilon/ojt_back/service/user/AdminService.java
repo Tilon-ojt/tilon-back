@@ -221,20 +221,20 @@ public class AdminService {
         try {
             adminUpdateDTO.setAdminId(adminId);
 
-            // 현재 밀번호 가져오기
+            // 현재 비밀번호 가져오기
             String currentPassword = adminMapper.getCurrentPassword(adminId);
-
-            // 현재 비밀번호와 입력된 비밀번호 비교
-            if (!passwordEncoder.matches(adminUpdateDTO.getCurrentPassword(), currentPassword)) {
-                response.put("status", HttpStatus.BAD_REQUEST);
-                response.put("message", "현재 비밀번호가 일치하지 않습니다.");
-                return response;
-            }
 
             // 비밀번호 검증
             if (!isValidPassword(adminUpdateDTO.getNewPassword())) {
                 response.put("status", HttpStatus.BAD_REQUEST);
                 response.put("message", "비밀번호는 영문자와 숫자의 조합으로 6자 이상이어야 합니다.");
+                return response;
+            }
+
+            // 현재 비밀번호와 입력된 비밀번호 비교
+            if (!passwordEncoder.matches(adminUpdateDTO.getCurrentPassword(), currentPassword)) {
+                response.put("status", HttpStatus.BAD_REQUEST);
+                response.put("message", "현재 비밀번호가 일치하지 않습니다.");
                 return response;
             }
 

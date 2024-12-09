@@ -85,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // /admin/update 및 /admin/check-password 경로에 대한 접근 권한 확인
-        if ((requestURI.startsWith("/admin/update") || requestURI.startsWith("/admin/check-password")) &&
+        if ((requestURI.startsWith("/admin/update")) &&
                 userDetails.getAuthorities().stream()
                         .noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
             logger.warn("ADMIN이 아닌 사용자의 접근 거부: {}", requestURI);
