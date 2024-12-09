@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.tilon.ojt_back.dao.user.AdminMapper;
 import com.tilon.ojt_back.domain.CustomUserDetails;
@@ -63,7 +64,7 @@ public class AdminService {
 
             if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 // 로그 추가: 비밀번호 불일치
-                System.out.println("비밀번호  불일치: " + loginDTO.getEmpName());
+                System.out.println("비밀번���  불일치: " + loginDTO.getEmpName());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
             }
@@ -230,7 +231,7 @@ public class AdminService {
                 return response;
             }
 
-            // 새 비밀번호 검증
+            // 비밀번호 검증
             if (!isValidPassword(adminUpdateDTO.getNewPassword())) {
                 response.put("status", HttpStatus.BAD_REQUEST);
                 response.put("message", "비밀번호는 영문자와 숫자의 조합으로 6자 이상이어야 합니다.");
@@ -258,11 +259,31 @@ public class AdminService {
     // 7. 어드민 삭제
 
     @Transactional
-    public Map<String, Object> deleteAdmins(List<Integer> adminIds) {
+    public Map<String, Object> deleteAdmins(String token, List<Integer> adminIds) {
         Map<String, Object> response = new HashMap<>();
+        int userId = jwtTokenProvider.getUserIdFromToken(token);
+        String userRole = jwtTokenProvider.getUserRoleFromToken(token); // 역할 추출
+
+        logger.info("삭제 요청을 받은 어드민 id 리스트와 요청한 사용자 ID : {}, {}", adminIds, userId);
+        logger.info("사용자 역할 : {}", userRole);
+
         try {
+            if ("ROLE_ADMIN".equals(userRole)) {
+                // ADMIN은 본인 계정만 삭제 가능
+                if (!adminIds.contains(userId) || adminIds.size() != 1) {
+                    response.put("message", "ADMIN은 본인 계정만 삭제할 수 있습니다.");
+                    response.put("status", HttpStatus.FORBIDDEN);
+                    return response;
+                }
+            }
+            // SUPER_ADMIN은 모든 ID 삭제 가능
             adminMapper.deleteByAdminIds(adminIds);
             response.put("message", "어드민 삭제가 성공적으로 완료되었습니다.");
+            response.put("status", HttpStatus.OK);
+
+            // 토큰을 블랙리스트에 추가하여 무효화
+            jwtTokenProvider.invalidateToken(token);
+
         } catch (Exception e) {
             logger.error("어드민 삭제 중 오류 발생: {}", e.getMessage());
             throw new RuntimeException("어드민 삭제 중 오류가 발생했습니다.");

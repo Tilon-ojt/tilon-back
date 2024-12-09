@@ -134,4 +134,11 @@ public class JwtTokenProvider {
         logger.info("Extracted claims from token: {}", claims); // 클레임 로그 추가
         return claims.get("adminId", Integer.class); // 클레임에서 adminId 가져옴
     }
+
+    // 토큰에서 사용자 역할 추출
+    public String getUserRoleFromToken(String token) {
+        Claims claims = extractClaims(token);
+        logger.info("Extracted role from token: {}", claims.get("role")); // 역할 로그 추가
+        return claims.get("role", String.class); // 클레임에서 역할 가져옴
+    }
 }
