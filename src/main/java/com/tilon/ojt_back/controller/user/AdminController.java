@@ -154,17 +154,27 @@ public class AdminController {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("message", "유효한 토큰이 필요합니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
         String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
-        int adminId = jwtTokenProvider.getUserIdFromToken(token);
+        int adminId;
+        try {
+            adminId = jwtTokenProvider.getUserIdFromToken(token);
+        } catch (Exception e) {
+            logger.error("토큰에서 사용자 ID 추출 중 오류 발생: {}", e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "유효하지 않은 토큰입니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+
         logger.info("어드민 정보 수정 요청한 토큰: {}", token);
         logger.info("수정할 정보: {}", adminUpdateDTO);
 
         try {
-            Map<String, Object> response = adminService.updateAdminInfo(adminId, adminUpdateDTO);
-            return ResponseEntity.status((HttpStatus) response.get("status")).body(response);
+            // 서비스 메서드 호출
+            ResponseEntity<Map<String, Object>> response = adminService.updateAdminInfo(adminId, adminUpdateDTO);
+            return response;
         } catch (Exception e) {
             logger.error("어드민 정보 수정 중 오류 발생: {}", e.getMessage());
             Map<String, Object> errorResponse = new HashMap<>();

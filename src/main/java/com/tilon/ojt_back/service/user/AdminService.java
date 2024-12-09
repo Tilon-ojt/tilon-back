@@ -64,7 +64,7 @@ public class AdminService {
 
             if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 // 로그 추가: 비밀번호 불일치
-                System.out.println("비밀번���  불일치: " + loginDTO.getEmpName());
+                System.out.println("비밀번호  불일치: " + loginDTO.getEmpName());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
             }
@@ -118,7 +118,7 @@ public class AdminService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
-            // 비밀번호가 null인 경우 디폴트 비밀번호 사용
+            // 비밀번��가 null인 경우 디폴트 비밀번호 사용
             String passwordToUse = adminRequestDTO.getPassword() != null ? adminRequestDTO.getPassword()
                     : DEFAULT_PASSWORD;
 
@@ -216,26 +216,28 @@ public class AdminService {
     }
 
     // 6. 비밀번호 변경
-    public Map<String, Object> updateAdminInfo(int adminId, AdminUpdateDTO adminUpdateDTO) {
+    public ResponseEntity<Map<String, Object>> updateAdminInfo(int adminId, AdminUpdateDTO adminUpdateDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
             adminUpdateDTO.setAdminId(adminId);
 
             // 현재 비밀번호 가져오기
             String currentPassword = adminMapper.getCurrentPassword(adminId);
+            if (currentPassword == null) {
+                response.put("message", "어드민 정보를 찾을 수 없습니다.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
 
             // 비밀번호 검증
             if (!isValidPassword(adminUpdateDTO.getNewPassword())) {
-                response.put("status", HttpStatus.BAD_REQUEST);
                 response.put("message", "비밀번호는 영문자와 숫자의 조합으로 6자 이상이어야 합니다.");
-                return response;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             // 현재 비밀번호와 입력된 비밀번호 비교
             if (!passwordEncoder.matches(adminUpdateDTO.getCurrentPassword(), currentPassword)) {
-                response.put("status", HttpStatus.BAD_REQUEST);
                 response.put("message", "현재 비밀번호가 일치하지 않습니다.");
-                return response;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             // 새 비밀번호 암호화
@@ -246,14 +248,13 @@ public class AdminService {
                     adminUpdateDTO.getNewPassword());
             adminMapper.updatePassword(adminUpdateDTO);
 
-            response.put("status", HttpStatus.OK);
             response.put("message", "어드민 정보가 성공적으로 수정되었습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             logger.error("어드민 정보 수정 중 오류 발생: {}", e.getMessage());
-            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-            response.put("message", "어드민 정보 수정 중 오류가 발생했습니다.");
+            response.put("message", "어드민 정보 수정 중 오류��� 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        return response;
     }
 
     // 7. 어드민 삭제
@@ -281,7 +282,7 @@ public class AdminService {
             response.put("message", "어드민 삭제가 성공적으로 완료되었습니다.");
             response.put("status", HttpStatus.OK);
 
-            // 토큰을 블랙리스트에 추가하여 무효화
+            // 토큰을 랙리스트에 추가하여 무효화
             jwtTokenProvider.invalidateToken(token);
 
         } catch (Exception e) {
