@@ -110,11 +110,11 @@ public class AdminController {
         }
     }
 
-    // 어드민 삭제
+    // 어드민 삭제 (비밀번호 확인 추가)
     @DeleteMapping("/account")
     public ResponseEntity<Map<String, Object>> deleteAdmins(
             @RequestHeader("Authorization") String authorizationHeader,
-            @RequestBody Map<String, List<Integer>> payload) {
+            @RequestBody Map<String, Object> payload) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("message", "유효한 토큰이 필요합니다.");
@@ -122,18 +122,9 @@ public class AdminController {
         }
 
         String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
-        List<Integer> adminIds = payload.get("adminIds");
-
-        if (adminIds == null || adminIds.isEmpty()) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "삭제할 어드민 ID가 필요합니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        logger.info("삭제 요청 받은 어드민 ID 리스트: {}", adminIds);
 
         try {
-            Map<String, Object> response = adminService.deleteAdmins(token, adminIds);
+            Map<String, Object> response = adminService.deleteAdminsWithValidation(token, payload);
             HttpStatus status = (HttpStatus) response.get("status");
             return ResponseEntity.status(status).body(response);
         } catch (Exception e) {

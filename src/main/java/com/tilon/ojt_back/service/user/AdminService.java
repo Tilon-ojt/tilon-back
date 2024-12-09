@@ -64,7 +64,7 @@ public class AdminService {
 
             if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 // 로그 추가: 비밀번호 불일치
-                System.out.println("비밀번호 불일치: " + loginDTO.getEmpName());
+                System.out.println("비밀번호  불일치: " + loginDTO.getEmpName());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
             }
@@ -118,7 +118,7 @@ public class AdminService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
-            // 비밀번호가 null인 경��� 디폴트 비밀번호 사용
+            // 비밀번호가 null인 경우 디폴트 비밀번호 사용
             String passwordToUse = adminRequestDTO.getPassword() != null ? adminRequestDTO.getPassword()
                     : DEFAULT_PASSWORD;
 
@@ -267,13 +267,36 @@ public class AdminService {
     // 7. 어드민 삭제
 
     @Transactional
-    public Map<String, Object> deleteAdmins(String token, List<Integer> adminIds) {
+    public Map<String, Object> deleteAdminsWithValidation(String token, Map<String, Object> payload) {
         Map<String, Object> response = new HashMap<>();
+        List<Integer> adminIds = (List<Integer>) payload.get("adminIds");
+        String password = (String) payload.get("password");
+
+        if (adminIds == null || adminIds.isEmpty()) {
+            response.put("message", "삭제할 어드민 ID가 필요합니다.");
+            response.put("status", HttpStatus.BAD_REQUEST);
+            return response;
+        }
+
+        if (password == null || password.isEmpty()) {
+            response.put("message", "비밀번호가 필요합니다.");
+            response.put("status", HttpStatus.BAD_REQUEST);
+            return response;
+        }
+
         int userId = jwtTokenProvider.getUserIdFromToken(token);
-        String userRole = jwtTokenProvider.getUserRoleFromToken(token); // 역할 추출
+        String userRole = jwtTokenProvider.getUserRoleFromToken(token);
 
         logger.info("삭제 요청을 받은 어드민 id 리스트와 요청한 사용자 ID : {}, {}", adminIds, userId);
         logger.info("사용자 역할 : {}", userRole);
+
+        // 비밀번호 확인 로직
+        boolean isPasswordValid = validatePassword(userId, password);
+        if (!isPasswordValid) {
+            response.put("message", "비밀번호가 일치하지 않습니다.");
+            response.put("status", HttpStatus.UNAUTHORIZED);
+            return response;
+        }
 
         try {
             if ("ROLE_ADMIN".equals(userRole)) {
@@ -298,4 +321,12 @@ public class AdminService {
         return response;
     }
 
+    // 비밀번호 확인 로직
+    private boolean validatePassword(int userId, String inputPassword) {
+        // 데이터베이스에서 암호화된 비밀번호 가져오기
+        String encryptedPassword = adminMapper.getCurrentPassword(userId);
+
+        // 입력된 비밀번호를 암호화하여 비교
+        return passwordEncoder.matches(inputPassword, encryptedPassword);
+    }
 }
