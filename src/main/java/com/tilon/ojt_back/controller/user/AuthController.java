@@ -18,7 +18,6 @@ import java.util.Map;
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 

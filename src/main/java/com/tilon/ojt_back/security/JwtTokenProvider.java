@@ -31,19 +31,19 @@ public class JwtTokenProvider {
     @Value("${secret-key}")
     private String SECRET_KEY; // 인스턴스 필드로 변경
 
-    // // Access Token 만료 시간
-    // private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 60 * 60 * 1000L; //
+    // Access Token 만료 시간
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 60 * 60 * 1000L; //
     // 1시간
 
-    // // Refresh Token 만료 시간
-    // private static final long REFRESH_TOKEN_EXPIRE_TIME = 12 * 60 * 60 * 1000L;
-    // // 12시간
-
-    // Access Token 만료 시간
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 60 * 1000L; // 1분
-
     // Refresh Token 만료 시간
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 5 * 60 * 1000L; // 5분
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 12 * 60 * 60 * 1000L;
+    // 12시간
+
+    // // Access Token 만료 시간
+    // private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 60 * 1000L; // 1분
+
+    // // Refresh Token 만료 시간
+    // private static final long REFRESH_TOKEN_EXPIRE_TIME = 5 * 60 * 1000L; // 5분
 
     // 만료된 토큰을 저장할 블랙리스트
     private Set<String> blacklist = ConcurrentHashMap.newKeySet();
