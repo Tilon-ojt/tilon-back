@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  my-cool-app:
+    image: openjdk:11-jre-slim
+    container_name: my-cool-app
+    working_dir: /app
+    environment:
+      - APP_HOME=/app
+    volumes:
+      - ./target/my-cool-app.jar:/app/app.jar
+    ports:
+      - "8080:8080"
+    command: ["java", "-jar", "app.jar"]
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"

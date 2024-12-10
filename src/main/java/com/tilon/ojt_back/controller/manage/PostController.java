@@ -46,7 +46,7 @@ public class PostController {
 
     // post 상세 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<?> getPost(@PathVariable int postId) {
+    public ResponseEntity<?> getPost(@PathVariable(name = "postId") int postId) {
         try {
             return ResponseEntity.ok(postService.getPost(postId));
         } catch (ResponseStatusException e) {
