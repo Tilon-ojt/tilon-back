@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import com.tilon.ojt_back.domain.RefreshToken;
 import com.tilon.ojt_back.dao.RefreshTokenRepository;
 
-
 @Service
 public class TokenService {
 
@@ -16,11 +15,13 @@ public class TokenService {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
+    // 리프레시 토큰 저장
     public void saveRefreshToken(String userId, String token) {
         RefreshToken refreshToken = new RefreshToken(userId, token);
         refreshTokenRepository.save(refreshToken);
     }
 
+    // 리프레시 토큰 조회
     public String getRefreshToken(String userId) {
         return refreshTokenRepository.findById(userId)
                 .map(RefreshToken::getToken)
