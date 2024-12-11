@@ -16,6 +16,9 @@
             nickname
         FROM 
             admin
+
+          WHERE 
+            role != 'ROLE_SUPER_ADMIN'
     </select>
 
     <!-- 2. empName로 사용자 정보를 조회하는 쿼리 -->
