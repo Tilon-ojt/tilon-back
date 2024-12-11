@@ -1,6 +1,7 @@
 package com.tilon.ojt_back.controller.manage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,15 +21,17 @@ import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostFix;
 import com.tilon.ojt_back.domain.manage.PostRequestDTO;
 import com.tilon.ojt_back.domain.manage.PostStatus;
+import com.tilon.ojt_back.security.JwtTokenProvider;
 import com.tilon.ojt_back.service.manage.PostService;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/posts")
 public class PostController {
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     // post 조회
     @GetMapping("")
@@ -65,10 +69,14 @@ public class PostController {
     // post 작성
     @PostMapping("")
     public ResponseEntity<?> createPost(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
             @RequestBody PostRequestDTO param,
             @RequestParam(name = "tempPostId") String tempPostId) {
         try {
-            postService.createPost(param, tempPostId);
+            String token = authorization.substring(7);
+            int adminId = jwtTokenProvider.getUserIdFromToken(token);
+
+            postService.createPost(param, tempPostId, adminId);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());

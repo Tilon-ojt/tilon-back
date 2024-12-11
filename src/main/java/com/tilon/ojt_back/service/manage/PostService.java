@@ -58,7 +58,8 @@ public class PostService {
     }
 
     // post 작성
-    public void createPost(PostRequestDTO param, String tempPostId) {
+    public void createPost(PostRequestDTO param, String tempPostId, int adminId) {
+        param.setAdminId(adminId);
         // post 작성
         postMapper.createPostRow(param);
         // 최신 postId 조회
