@@ -67,6 +67,7 @@ public class SecurityConfig {
         config.addAllowedOrigin("http://localhost:3000"); // 프론트엔드 URL 지정
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        config.addExposedHeader("Refresh"); // "Refresh" 헤더 노출 설정
         source.registerCorsConfiguration("/**", config);
         return source;
     }
