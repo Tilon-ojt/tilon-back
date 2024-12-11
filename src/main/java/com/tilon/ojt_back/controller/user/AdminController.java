@@ -28,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.tilon.ojt_back.exception.CustomException;
+import com.tilon.ojt_back.exception.ErrorCode;
+
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -44,26 +47,16 @@ public class AdminController {
     // 어드민 목록 조회
     @GetMapping("/accounts")
     public List<AdminResponseDTO> getAdminList() {
-        logger.info("Admin list request received");
-        List<AdminResponseDTO> adminList = adminService.getAdminList();
-        logger.info("Admin list response: {}", adminList);
-        return adminList;
+        return adminService.getAdminList();
     }
 
     // 어드민 등록
     @PostMapping("/accounts")
     public ResponseEntity<Map<String, Object>> registerAdmin(@RequestBody AdminRequestDTO adminRequestDTO) {
         logger.info("Admin register request received: {}", adminRequestDTO);
-        try {
-            ResponseEntity<Map<String, Object>> response = adminService.registerAdmin(adminRequestDTO);
-            logger.info("Admin register response: {}", response);
-            return response;
-        } catch (Exception e) {
-            logger.error("Error during admin registration: {}", e.getMessage());
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "어드민 등록 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+        ResponseEntity<Map<String, Object>> response = adminService.registerAdmin(adminRequestDTO);
+        logger.info("Admin register response: {}", response);
+        return response;
     }
 
     // 계정 비밀번호 초기화
@@ -131,23 +124,14 @@ public class AdminController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody Map<String, Object> payload) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "유효한 토큰이 필요합니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            throw new CustomException(ErrorCode.BAD_REQUEST); // 유효한 토큰이 필요합니다.
         }
 
         String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
 
-        try {
-            Map<String, Object> response = adminService.deleteAdminsWithValidation(token, payload);
-            HttpStatus status = (HttpStatus) response.get("status");
-            return ResponseEntity.status(status).body(response);
-        } catch (Exception e) {
-            logger.error("어드민 삭제 중 오류 발생: {}", e.getMessage());
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "어드민 삭제 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+        Map<String, Object> response = adminService.deleteAdminsWithValidation(token, payload);
+        HttpStatus status = (HttpStatus) response.get("status");
+        return ResponseEntity.status(status).body(response);
     }
 
     // 3. admin 권한 필요
@@ -158,9 +142,7 @@ public class AdminController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody AdminUpdateDTO adminUpdateDTO) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "유효한 토큰이 필요합니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            throw new CustomException(ErrorCode.UNAUTHORIZED); // 유효한 토큰이 필요합니다.
         }
 
         String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
@@ -168,16 +150,8 @@ public class AdminController {
         logger.info("어드민 정보 수정 요청한 토큰: {}", token);
         logger.info("수정할 정보: {}", adminUpdateDTO);
 
-        try {
-            // 서비스 메서드 호출
-            ResponseEntity<Map<String, Object>> response = adminService.updateAdminInfo(adminUpdateDTO, token);
-            return response;
-        } catch (Exception e) {
-            logger.error("어드민 정보 수정 중 오류 발생: {}", e.getMessage());
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "어드민 정보 수정 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+        // 서비스 메서드 호출
+        return adminService.updateAdminInfo(adminUpdateDTO, token);
     }
 
 }

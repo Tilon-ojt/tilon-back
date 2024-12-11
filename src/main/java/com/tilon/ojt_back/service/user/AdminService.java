@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.tilon.ojt_back.dao.user.AdminMapper;
 import com.tilon.ojt_back.domain.CustomUserDetails;
@@ -26,6 +25,8 @@ import com.tilon.ojt_back.domain.user.AdminResponseDTO;
 import com.tilon.ojt_back.domain.user.AdminUpdateDTO;
 import com.tilon.ojt_back.domain.user.LoginDTO;
 import com.tilon.ojt_back.security.JwtTokenProvider;
+import com.tilon.ojt_back.exception.CustomException;
+import com.tilon.ojt_back.exception.ErrorCode;
 
 @Service
 public class AdminService {
@@ -45,122 +46,98 @@ public class AdminService {
 
     // 1. 어드민 목록 조회
     public List<AdminResponseDTO> getAdminList() {
-        return adminMapper.getAdminList();
-
+        List<AdminResponseDTO> adminList = adminMapper.getAdminList();
+        if (adminList == null || adminList.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND);
+        }
+        return adminList;
     }
 
     // 2. 어드민 로그인
     public ResponseEntity<Map<String, Object>> login(LoginDTO loginDTO) {
-        try {
-            // 로그 추가: 로그인 시도
-            System.out.println("로그인 시도: " + loginDTO.getEmpName());
+        // 로그 추가: 로그인 시도
+        System.out.println("로그인 시도: " + loginDTO.getEmpName());
 
-            AdminResponseDTO user = adminMapper.getUserByEmpName(loginDTO.getEmpName());
-            if (user == null) {
-                // 로그 추가: 사용자 정보 없음
-                System.out.println("사용자 정보 없음: " + loginDTO.getEmpName());
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
-            }
-
-            if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-                // 로그 추가: 비밀번호 불일치
-                System.out.println("비밀번호  불일치: " + loginDTO.getEmpName());
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Collections.singletonMap("message", "사원번호 혹은 비밀번호가 틀렸습니다."));
-            }
-
-            CustomUserDetails userDetails = new CustomUserDetails(
-                    user.getAdminId(),
-                    user.getEmpName(),
-                    user.getPassword(),
-                    user.getNickname(),
-                    new ArrayList<>(),
-                    user.getRole());
-
-            String accessToken = jwtTokenProvider.createAccessToken(userDetails);
-            String refreshToken = jwtTokenProvider.createRefreshToken(userDetails);
-
-            // 로그 추가: 토큰 생성 성공
-            System.out.println("토큰 생성 성공: " + user.getEmpName());
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("accessToken", accessToken);
-            response.put("adminId", user.getAdminId());
-            response.put("role", user.getRole());
-            response.put("empName", user.getEmpName());
-            response.put("nickname", user.getNickname());
-
-            // 헤더에 리프레시 토큰 추가
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Refresh", refreshToken);
-
-            return ResponseEntity.ok().headers(headers).body(response);
-        } catch (Exception e) {
-            // 예외 처리: 로그 추가
-            System.err.println("로그인 처리 중 오류 발생: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "로그인 처리 중 오류가 발생했습니다."));
+        AdminResponseDTO user = adminMapper.getUserByEmpName(loginDTO.getEmpName());
+        if (user == null) {
+            // 로그 추가: 사용자 정보 없음
+            System.out.println("사용자 정보 없음: " + loginDTO.getEmpName());
+            throw new CustomException(ErrorCode.NOT_FOUND);
         }
+
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            // 로그 추가: 비밀번호 불일치
+            System.out.println("비밀번호 불일치: " + loginDTO.getEmpName());
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        CustomUserDetails userDetails = new CustomUserDetails(
+                user.getAdminId(),
+                user.getEmpName(),
+                user.getPassword(),
+                user.getNickname(),
+                new ArrayList<>(),
+                user.getRole());
+
+        String accessToken = jwtTokenProvider.createAccessToken(userDetails);
+        String refreshToken = jwtTokenProvider.createRefreshToken(userDetails);
+
+        // 로그 추가: 토큰 생성 성공
+        System.out.println("토큰 생성 성공: " + user.getEmpName());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("adminId", user.getAdminId());
+        response.put("role", user.getRole());
+        response.put("empName", user.getEmpName());
+        response.put("nickname", user.getNickname());
+
+        // 헤더에 리프레시 토큰 추가
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Refresh", refreshToken);
+
+        return ResponseEntity.ok().headers(headers).body(response);
     }
 
     // 3. 어드민 등록
-    public ResponseEntity<Map<String, Object>> registerAdmin(AdminRequestDTO adminRequestDTO) throws Exception {
-        try {
-            // 어드민 존재 여부 확인
-            AdminResponseDTO existingAdmin = adminMapper.getUserByEmpName(adminRequestDTO.getEmpName());
-            if (existingAdmin != null) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("message", "이미 존재하는 어드민입니다.");
-                response.put("status", HttpStatus.CONFLICT.value());
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-            }
-
-            // empName 유효성 검사: 영어만 가능
-            if (!isValidEmpName(adminRequestDTO.getEmpName())) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("message", "empName은 영어와 숫자만 포함해야 합니다.");
-                response.put("status", HttpStatus.BAD_REQUEST.value());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-
-            // 비밀번호가 null인 경우 디폴트 비밀번호 사용
-            String passwordToUse = adminRequestDTO.getPassword() != null ? adminRequestDTO.getPassword()
-                    : DEFAULT_PASSWORD;
-
-            // 비밀번호 유효성 검사: 영어, 숫자 조합으로 6자 이상
-            if (!isValidPassword(passwordToUse)) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("message", "비밀번호는 영어와 숫자의 조합으로 6자 이상이어야 합니다.");
-                response.put("status", HttpStatus.BAD_REQUEST.value());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-
-            // 비밀번호 암호화
-            String encodedPassword = passwordEncoder.encode(passwordToUse);
-            adminRequestDTO.setPassword(encodedPassword);
-
-            // 매퍼를 통해 어드민 등록
-            adminMapper.insertAdmin(adminRequestDTO);
-            System.out.println("어드민 등록 성공: " + adminRequestDTO.getEmpName());
-
-            // 등���된 어드민 정보 조회
-            AdminResponseDTO newAdmin = adminMapper.getUserByEmpName(adminRequestDTO.getEmpName());
-
-            // 응답 데이터 구성
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "어드민이 성공적으로 등록되었습니다.");
-            response.put("admin", newAdmin);
-            response.put("status", HttpStatus.CREATED.value());
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            e.printStackTrace(); // 예외 로그 출력
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "어드민 등록 중 오류가 발생했습니다.");
-            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    public ResponseEntity<Map<String, Object>> registerAdmin(AdminRequestDTO adminRequestDTO) {
+        // 어드민 존재 여부 확인
+        AdminResponseDTO existingAdmin = adminMapper.getUserByEmpName(adminRequestDTO.getEmpName());
+        if (existingAdmin != null) {
+            throw new CustomException(ErrorCode.CONFLICT); // 이미 존재하는 어드민
         }
+
+        // empName 유효성 검사: 영어만 가능
+        if (!isValidEmpName(adminRequestDTO.getEmpName())) {
+            throw new CustomException(ErrorCode.INVALID_EMP_NAME); // 유효하지 않은 empName
+        }
+
+        // 비밀번호가 null인 경우 디폴트 비밀번호 사용
+        String passwordToUse = adminRequestDTO.getPassword() != null ? adminRequestDTO.getPassword() : DEFAULT_PASSWORD;
+
+        // 비밀번호 유효성 검사: 영어, 숫자 조합으로 6자 이상
+        if (!isValidPassword(passwordToUse)) {
+            throw new CustomException(ErrorCode.BAD_REQUEST); // 유효하지 않은 비밀번호
+        }
+
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(passwordToUse);
+        adminRequestDTO.setPassword(encodedPassword);
+
+        // 매퍼를 통해 어드민 등록
+        adminMapper.insertAdmin(adminRequestDTO);
+        System.out.println("어드민 등록 성공: " + adminRequestDTO.getEmpName());
+
+        // 등록된 어드민 정보 조회
+        AdminResponseDTO newAdmin = adminMapper.getUserByEmpName(adminRequestDTO.getEmpName());
+
+        // 응답 데이터 구성
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "어드민이 성공적으로 등록되었습니다.");
+        response.put("admin", newAdmin);
+        response.put("status", HttpStatus.CREATED.value());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // empName 유효성 검사 메서드 수정
@@ -223,71 +200,61 @@ public class AdminService {
 
     // 6. 비밀번호 변경
     public ResponseEntity<Map<String, Object>> updateAdminInfo(AdminUpdateDTO adminUpdateDTO, String token) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            int adminId = jwtTokenProvider.getUserIdFromToken(token); // 토큰에서 ID 추출
-            String userRole = jwtTokenProvider.getUserRoleFromToken(token); // 역할 추출
-            adminUpdateDTO.setAdminId(adminId);
+        int adminId = jwtTokenProvider.getUserIdFromToken(token); // 토큰에서 ID 추출
+        String userRole = jwtTokenProvider.getUserRoleFromToken(token); // 역할 추출
+        adminUpdateDTO.setAdminId(adminId);
 
-            if ("ROLE_SUPER_ADMIN".equals(userRole)) {
-                response.put("message", "SUPER_ADMIN은 비밀번호를 변경할 수 없습니다.");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-            }
-
-            // 현재 비밀번호 가져오기
-            String currentPassword = adminMapper.getCurrentPassword(adminId);
-            if (currentPassword == null) {
-                response.put("message", "어드민 정보를 찾을 수 없습니다.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-
-            // 비밀번호 검증
-            if (!isValidPassword(adminUpdateDTO.getNewPassword())) {
-                response.put("message", "비밀번호는 영문자와 숫자의 조합으로 6자 이상이어야 합니다.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-
-            // 현재 비밀번호와 입력된 비밀번호 비교
-            if (!passwordEncoder.matches(adminUpdateDTO.getCurrentPassword(), currentPassword)) {
-                response.put("message", "현재 비밀번호가 일치하지 않습니다.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-
-            // 새 비밀번호 암호화
-            String encodedPassword = passwordEncoder.encode(adminUpdateDTO.getNewPassword());
-            adminUpdateDTO.setNewPassword(encodedPassword);
-
-            logger.info("adminUpdateDTO: adminId-{}, newPassword-{}", adminUpdateDTO.getAdminId(),
-                    adminUpdateDTO.getNewPassword());
-            adminMapper.updatePassword(adminUpdateDTO);
-
-            response.put("message", "어드민 정보가 성공적으로 수정되었습니다.");
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            logger.error("어드민 정보 수정 중 오류 발생: {}", e.getMessage());
-            response.put("message", "어드민 정보 수정 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        if ("ROLE_SUPER_ADMIN".equals(userRole)) {
+            throw new CustomException(ErrorCode.FORBIDDEN_SUPER_ADMIN_PASSWORD_CHANGE); // SUPER_ADMIN은 비밀번호를 변경할 수 없습니다.
         }
+
+        // 현재 비밀번호 가져오기
+        String currentPassword = adminMapper.getCurrentPassword(adminId);
+        if (currentPassword == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND); // 어드민 정보를 찾을 수 없습니다.
+        }
+
+        // 비밀번호 검증
+        if (!isValidPassword(adminUpdateDTO.getNewPassword())) {
+            throw new CustomException(ErrorCode.BAD_REQUEST); // 비밀번호는 영문자와 숫자의 조합으로 6자 이상이어야 합니다.
+        }
+
+        // 현재 비밀번호와 입력된 비밀번호 비교
+        if (!passwordEncoder.matches(adminUpdateDTO.getCurrentPassword(), currentPassword)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED); // 현재 비밀번호가 일치하지 않습니다.
+        }
+
+        // 현재 비밀번호와 새 비밀번호가 동일한지 확인
+        if (adminUpdateDTO.getCurrentPassword().equals(adminUpdateDTO.getNewPassword())) {
+            throw new CustomException(ErrorCode.SAME_PASSWORD); // 두 입력값이 동일합니다.
+        }
+
+        // 새 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(adminUpdateDTO.getNewPassword());
+        adminUpdateDTO.setNewPassword(encodedPassword);
+
+        logger.info("adminUpdateDTO: adminId-{}, newPassword-{}", adminUpdateDTO.getAdminId(),
+                adminUpdateDTO.getNewPassword());
+        adminMapper.updatePassword(adminUpdateDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "어드민 정보가 성공적으로 수정되었습니다.");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 7. 어드민 삭제
 
     @Transactional
     public Map<String, Object> deleteAdminsWithValidation(String token, Map<String, Object> payload) {
-        Map<String, Object> response = new HashMap<>();
         List<Integer> adminIds = (List<Integer>) payload.get("adminIds");
         String password = (String) payload.get("password");
 
         if (adminIds == null || adminIds.isEmpty()) {
-            response.put("message", "삭제할 어드민 ID가 필요합니다.");
-            response.put("status", HttpStatus.BAD_REQUEST);
-            return response;
+            throw new CustomException(ErrorCode.BAD_REQUEST); // 삭제할 어드민 ID가 필요합니다.
         }
 
         if (password == null || password.isEmpty()) {
-            response.put("message", "비밀번호가 필요합니다.");
-            response.put("status", HttpStatus.BAD_REQUEST);
-            return response;
+            throw new CustomException(ErrorCode.BAD_REQUEST); // 비밀번호가 필요합니다.
         }
 
         int userId = jwtTokenProvider.getUserIdFromToken(token);
@@ -299,31 +266,24 @@ public class AdminService {
         // 비밀번호 확인 로직
         boolean isPasswordValid = validatePassword(userId, password);
         if (!isPasswordValid) {
-            response.put("message", "비밀번호가 일치하지 않습니다.");
-            response.put("status", HttpStatus.UNAUTHORIZED);
-            return response;
+            throw new CustomException(ErrorCode.UNAUTHORIZED); // 비밀번호가 일치하지 않습니다.
         }
 
-        try {
-            if ("ROLE_ADMIN".equals(userRole)) {
-                // ADMIN은 본인 계정만 삭제 가능
-                if (!adminIds.contains(userId) || adminIds.size() != 1) {
-                    response.put("message", "ADMIN은 본인 계정만 삭제할 수 있습니다.");
-                    response.put("status", HttpStatus.FORBIDDEN);
-                    return response;
-                }
-                // ADMIN이 본인 계정을 삭제할 때만 토큰 무효화
-                jwtTokenProvider.invalidateToken(token);
+        if ("ROLE_ADMIN".equals(userRole)) {
+            // ADMIN은 본인 계정만 삭제 가능
+            if (!adminIds.contains(userId) || adminIds.size() != 1) {
+                throw new CustomException(ErrorCode.FORBIDDEN_SELF_DELETION); // 본인 계정만 삭제 가능
             }
-            // SUPER_ADMIN은 모든 ID 삭제 가능
-            adminMapper.deleteByAdminIds(adminIds);
-            response.put("message", "어드민 삭제가 성공적으로 완료되었습니다.");
-            response.put("status", HttpStatus.OK);
-
-        } catch (Exception e) {
-            logger.error("어드민 삭제 중 오류 발생: {}", e.getMessage());
-            throw new RuntimeException("어드민 삭제 중 오류가 발생했습니다.");
+            // ADMIN이 본인 계정을 삭제할 때만 토큰 무효화
+            jwtTokenProvider.invalidateToken(token);
         }
+
+        // SUPER_ADMIN은 모든 ID 삭제 가능
+        adminMapper.deleteByAdminIds(adminIds);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "어드민 삭제가 성공적으로 완료되었습니다.");
+        response.put("status", HttpStatus.OK);
+
         return response;
     }
 

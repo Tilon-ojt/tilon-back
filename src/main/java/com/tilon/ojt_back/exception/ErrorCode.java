@@ -28,7 +28,13 @@ public enum ErrorCode {
     // post status, fix 관련 예외
     INVALID_DRAFT_FIX(HttpStatus.BAD_REQUEST, "게시되어 있지 않지만 고정되어 있는 게시물입니다."),
     INVALID_POST_STATUS(HttpStatus.BAD_REQUEST, "고정 게시글은 상태 변경이 불가능합니다."),
-    INVALID_POST_FIX(HttpStatus.BAD_REQUEST, "게시글이 게시되어 있을 때만 고정 가능합니다.");
+    INVALID_POST_FIX(HttpStatus.BAD_REQUEST, "게시글이 게시되어 있을 때만 고정 가능합니다."),
+
+    // admin 관련 예외 
+    INVALID_EMP_NAME(HttpStatus.BAD_REQUEST, "empName은 영어와 숫자만 포함해야 합니다."),
+    FORBIDDEN_SELF_DELETION(HttpStatus.FORBIDDEN, "ADMIN은 본인 계정만 삭제할 수 있습니다."),
+    SAME_PASSWORD(HttpStatus.BAD_REQUEST, "현재 비밀번호와 새 비밀번호가 동일합니다."),
+    FORBIDDEN_SUPER_ADMIN_PASSWORD_CHANGE(HttpStatus.FORBIDDEN, "SUPER_ADMIN은 비밀번호를 변경할 수 없습니다.");
     
     private final HttpStatus httpStatus;
     private final String message;
