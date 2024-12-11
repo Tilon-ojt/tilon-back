@@ -20,7 +20,15 @@ public enum ErrorCode {
     // post 관련 예외
     INVALID_POST_ID(HttpStatus.BAD_REQUEST, "postId가 유효하지 않습니다."),
     INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리가 유효하지 않습니다."),
-    INVALID_OFFSET_OR_SIZE(HttpStatus.BAD_REQUEST, "offset 또는 size가 유효하지 않습니다.");
+    INVALID_OFFSET_OR_SIZE(HttpStatus.BAD_REQUEST, "offset 또는 size가 유효하지 않습니다."),
+    INVALID_POST_ID_OR_TEMP_POST_ID(HttpStatus.BAD_REQUEST, "postId와 tempPostId 둘 다 없습니다."),
+    INVALID_TEMP_POST_ID(HttpStatus.BAD_REQUEST, "tempPostId가 없습니다."),
+    INVALID_ADMIN_ID(HttpStatus.BAD_REQUEST, "작성자가 없습니다."),
+
+    // post status, fix 관련 예외
+    INVALID_DRAFT_FIX(HttpStatus.BAD_REQUEST, "게시되어 있지 않지만 고정되어 있는 게시물입니다."),
+    INVALID_POST_STATUS(HttpStatus.BAD_REQUEST, "고정 게시글은 상태 변경이 불가능합니다."),
+    INVALID_POST_FIX(HttpStatus.BAD_REQUEST, "게시글이 게시되어 있을 때만 고정 가능합니다.");
     
     private final HttpStatus httpStatus;
     private final String message;

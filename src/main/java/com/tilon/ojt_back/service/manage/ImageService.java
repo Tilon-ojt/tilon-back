@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tilon.ojt_back.dao.manage.ImageMapper;
+import com.tilon.ojt_back.exception.CustomException;
+import com.tilon.ojt_back.exception.ErrorCode;
 
 @Service
 public class ImageService {
@@ -38,17 +40,19 @@ public class ImageService {
             filePath.getParent().toFile().mkdirs();
         }
 
+        // postId와 tempPostId 둘 다 없으면 예외 발생
+        if (postId == null && tempPostId == null) {
+            throw new CustomException(ErrorCode.INVALID_POST_ID_OR_TEMP_POST_ID);
+        }
+
         // postId로 이미지 저장 (post 수정시)
         if (postId != null) {
             Map<String, Object> param = new HashMap<>();
             param.put("postId", postId);
             param.put("fileName", fileName);
             param.put("filePath", filePath.toString());
-            try {
-                imageMapper.insertImageRow(param);
-            } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to insert image", e);
-            }
+            // DB에 fileName, filePath 저장
+            imageMapper.insertImageRow(param);
         } 
         // tempPostId로 이미지 저장 (post 작성시)
         else if (tempPostId != null) {
@@ -56,12 +60,8 @@ public class ImageService {
             param.put("tempPostId", tempPostId);
             param.put("fileName", fileName);
             param.put("filePath", filePath.toString());
-            try {
-                //DB에 fileName, filePath 저장
-                imageMapper.insertImageRow(param);
-            } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to insert image", e);
-            }
+            // DB에 fileName, filePath 저장
+            imageMapper.insertImageRow(param);
         }
 
         // 서버에 이미지 저장
@@ -80,24 +80,21 @@ public class ImageService {
         Map<String, Object> param = new HashMap<>();
         param.put("tempPostId", tempPostId);
         param.put("postId", postId);
-        try {
-            imageMapper.updatePostIdForImageRow(param);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update postId for image", e);
-        }
+        // DB에서 임시 postId를 실제 postId로 업데이트
+        imageMapper.updatePostIdForImageRow(param);
     }
 
     // fileName으로 이미지 삭제
     public void deleteImage(String fileName) {
         Path filePath = Paths.get(uploadPath, fileName);
+        // 서버에서 이미지 삭제
         try {
-            // 서버에서 이미지 삭제
             Files.deleteIfExists(filePath);
-            // DB에서 이미지 삭제
-            imageMapper.deleteImageRow(fileName);
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete image", e);
         }
+        // DB에서 이미지 삭제
+        imageMapper.deleteImageRow(fileName);
     }
 
     // postId로 서버에서 이미지 삭제
