@@ -72,7 +72,7 @@ public class ImageService {
         }
 
         // 파일 경로 반환
-        return "/static/image/" + fileName;
+        return "image/" + fileName;
     }
 
     // 임시 postId를 실제 postId로 업데이트

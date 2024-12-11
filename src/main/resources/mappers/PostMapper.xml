@@ -28,7 +28,7 @@
     <select id="getPostRow"
             parameterType="int"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
-        SELECT p.post_id as postId, p.title, p.content, p.category, p.admin_id as adminId, p.created_at as createdAt, p.updated_at as updatedAt, p.status, p.fix, p.link, pi.file_path as imageUrl
+        SELECT p.post_id as postId, p.title, p.content, p.category, p.admin_id as adminId, p.created_at as createdAt, p.updated_at as updatedAt, p.status, p.fix, p.link, pi.file_name as imageUrl
         FROM post p
         LEFT JOIN postimages pi ON p.post_id = pi.post_id
         WHERE p.post_id = #{postId};
