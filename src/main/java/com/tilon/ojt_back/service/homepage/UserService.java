@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-
 import com.tilon.ojt_back.dao.homepage.UserMapper;
 import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostResponseDTO;
