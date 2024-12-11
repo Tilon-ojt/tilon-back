@@ -16,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.tilon.ojt_back.dao.homepage.UserMapper;
 import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostResponseDTO;
+import com.tilon.ojt_back.exception.CustomException;
+import com.tilon.ojt_back.exception.ErrorCode;
 
 @Service
 public class UserService {
@@ -24,36 +26,42 @@ public class UserService {
 
     // user의 posts 조회
     public Page<PostResponseDTO> getPosts(PostCategory category, int offset, int size) {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("category", category);
-            params.put("offset", offset);
-            params.put("size", size);
-
-            List<PostResponseDTO> posts = userMapper.getPostsRow(params);
-            int pageNumber = offset / size;
-            Pageable pageable = PageRequest.of(pageNumber, size);
-            return new PageImpl<>(posts, pageable, userMapper.getPostsCountRow(category));
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to get posts", e);
+        // 1. category 검증
+        if (category == null) {
+            throw new CustomException(ErrorCode.INVALID_CATEGORY);
         }
+
+        // 2. offset, size 검증
+        if (offset < 0 || size <= 0) {
+            throw new CustomException(ErrorCode.INVALID_OFFSET_OR_SIZE);
+        }
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("category", category);
+        params.put("offset", offset);
+        params.put("size", size);
+        List<PostResponseDTO> posts = userMapper.getPostsRow(params);
+
+        int pageNumber = offset / size;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+
+        return new PageImpl<>(posts, pageable, userMapper.getPostsCountRow(category));
     }
 
     // user의 post 상세 조회
     public PostResponseDTO getPost(int postId) {
-        try {
-            return userMapper.getPostRow(postId);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to get post", e);
+        // 1. postId 검증
+        if (postId <= 0) {
+            throw new CustomException(ErrorCode.INVALID_POST_ID);
         }
+        return userMapper.getPostRow(postId);
     }
 
     // user의 homepage 조회
     public List<PostResponseDTO> getHomepage(PostCategory category) {
-        try {
-            return userMapper.getHomepage(category);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to get homepage", e);
+        if (category == null) {
+            throw new CustomException(ErrorCode.INVALID_CATEGORY);
         }
+        return userMapper.getHomepage(category);
     }
 }
