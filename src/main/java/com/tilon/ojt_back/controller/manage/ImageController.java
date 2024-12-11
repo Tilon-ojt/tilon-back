@@ -1,5 +1,8 @@
 package com.tilon.ojt_back.controller.manage;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +22,7 @@ public class ImageController {
 
     // 이미지 업로드
     @PostMapping("upload")
-    public ResponseEntity<String> uploadImage(
+    public ResponseEntity<?> uploadImage(
         @RequestParam("ImgFile") MultipartFile file,
         @RequestParam(value = "postId", required = false) Integer postId,
         @RequestParam(value = "tempPostId", required = false) String tempPostId) {
@@ -27,8 +30,10 @@ public class ImageController {
             // 이미지 업로드
             String imageUrl = imageService.uploadImage(file, tempPostId, postId);
 
+            Map<String, String> response = new HashMap<>();
+            response.put("imageUrl", imageUrl);
             // CKEditor에 이미지 URL 반환
-            return ResponseEntity.ok(imageUrl);
+            return ResponseEntity.ok(response);
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }

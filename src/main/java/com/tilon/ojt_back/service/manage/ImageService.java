@@ -27,9 +27,6 @@ public class ImageService {
     @Value("${image.upload.path}")
     private String uploadPath;
 
-    @Value("${server.domain}")
-    private String serverDomain;
-
     public String uploadImage(MultipartFile file, String tempPostId, Integer postId){
         // 파일 이름 생성
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
@@ -75,7 +72,7 @@ public class ImageService {
         }
 
         // 파일 경로 반환
-        return serverDomain + "/static/image/" + fileName;
+        return "/static/image/" + fileName;
     }
 
     // 임시 postId를 실제 postId로 업데이트
