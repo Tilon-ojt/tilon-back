@@ -18,8 +18,6 @@ import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.user.LoginDTO;
 import com.tilon.ojt_back.service.homepage.UserService;
 import com.tilon.ojt_back.service.user.AdminService;
-import org.springframework.web.server.ResponseStatusException;
-
 
 @RestController
 @RequestMapping("/user")
