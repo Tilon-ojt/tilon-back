@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
     // 정적 리소스 경로 설정
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**") // "/static/**" 경로로 들어오는 요청을 처리
-                .addResourceLocations("classpath:/static/"); // Spring Boot의 기본 정적 리소스 경로 사용
+        registry.addResourceHandler("/static/image/**") // "/static/image/**" 경로로 들어오는 요청을 처리
+                .addResourceLocations("classpath:/static/image/"); // 실제 리소스가 위치한 경로
     }
 }
