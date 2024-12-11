@@ -10,8 +10,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-        .allowedOrigins("http://localhost:3000") //내 포트가 아니라 들어오는 url 로 지정해줘야 한다. 예를 들어 요청을 하는 프론트의 url로 지정 
-        .allowedMethods("*");
+                .allowedOrigins("http://localhost:3000") // 내 포트가 아니라 들어오는 url 로 지정해줘야 한다. 예를 들어 요청을 하는 프론트의 url로 지정
+                .allowedMethods("*")
+                .exposedHeaders("Refresh");
     }
 
     // 정적 리소스 경로 설정

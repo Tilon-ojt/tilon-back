@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -85,13 +86,16 @@ public class AdminService {
 
             Map<String, Object> response = new HashMap<>();
             response.put("accessToken", accessToken);
-            response.put("refreshToken", refreshToken);
             response.put("adminId", user.getAdminId());
             response.put("role", user.getRole());
             response.put("empName", user.getEmpName());
             response.put("nickname", user.getNickname());
 
-            return ResponseEntity.ok(response);
+            // 헤더에 리프레시 토큰 추가
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Refresh", refreshToken);
+
+            return ResponseEntity.ok().headers(headers).body(response);
         } catch (Exception e) {
             // 예외 처리: 로그 추가
             System.err.println("로그인 처리 중 오류 발생: " + e.getMessage());
@@ -140,7 +144,7 @@ public class AdminService {
             adminMapper.insertAdmin(adminRequestDTO);
             System.out.println("어드민 등록 성공: " + adminRequestDTO.getEmpName());
 
-            // 등록된 어드민 정보 조회
+            // 등���된 어드민 정보 조회
             AdminResponseDTO newAdmin = adminMapper.getUserByEmpName(adminRequestDTO.getEmpName());
 
             // 응답 데이터 구성
