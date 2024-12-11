@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.tilon.ojt_back.domain.manage.PostCategory;
 import com.tilon.ojt_back.domain.manage.PostFix;
@@ -41,21 +40,14 @@ public class PostController {
 
         int size = 10;
         int offset = (page - 1) * size;
-        try {
-            return ResponseEntity.ok(postService.getPosts(category, offset, size));
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+
+        return ResponseEntity.ok(postService.getPosts(category, offset, size));
     }
 
     // post 상세 조회
     @GetMapping("/{postId}")
     public ResponseEntity<?> getPost(@PathVariable(name = "postId") int postId) {
-        try {
-            return ResponseEntity.ok(postService.getPost(postId));
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+        return ResponseEntity.ok(postService.getPost(postId));
     }
 
     // post 작성 시 임시 postId 생성
@@ -72,15 +64,12 @@ public class PostController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
             @RequestBody PostRequestDTO param,
             @RequestParam(name = "tempPostId") String tempPostId) {
-        try {
-            String token = authorization.substring(7);
-            int adminId = jwtTokenProvider.getUserIdFromToken(token);
 
-            postService.createPost(param, tempPostId, adminId);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+        String token = authorization.substring(7);
+        int adminId = jwtTokenProvider.getUserIdFromToken(token);
+
+        postService.createPost(param, tempPostId, adminId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // post 수정
@@ -89,12 +78,8 @@ public class PostController {
             @PathVariable(name = "postId") int postId,
             @RequestBody PostRequestDTO param) {
 
-        try {
-            postService.updatePost(postId, param);
-            return ResponseEntity.noContent().build();
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+        postService.updatePost(postId, param);
+        return ResponseEntity.noContent().build();
     }
 
     // post status 수정
@@ -103,12 +88,8 @@ public class PostController {
             @PathVariable(name = "postId") int postId,
             @RequestParam(name = "status") PostStatus status) {
 
-        try {
-            postService.updatePostStatus(postId, status);
-            return ResponseEntity.noContent().build();
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+        postService.updatePostStatus(postId, status);
+        return ResponseEntity.noContent().build();
     }
 
     // post fix 수정
@@ -117,22 +98,14 @@ public class PostController {
             @PathVariable(name = "postId") int postId,
             @RequestParam(name = "fix") PostFix fix) {
 
-        try {
-            postService.updatePostFix(postId, fix);
-            return ResponseEntity.noContent().build();
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+        postService.updatePostFix(postId, fix);
+        return ResponseEntity.noContent().build();
     }
 
     // post 삭제
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable(name = "postId") int postId) {
-        try {
-            postService.deletePost(postId);
-            return ResponseEntity.noContent().build();
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
     }
 }

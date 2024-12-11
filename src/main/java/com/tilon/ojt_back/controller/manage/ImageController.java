@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.tilon.ojt_back.service.manage.ImageService;
 
@@ -26,27 +25,19 @@ public class ImageController {
         @RequestParam("ImgFile") MultipartFile file,
         @RequestParam(value = "postId", required = false) Integer postId,
         @RequestParam(value = "tempPostId", required = false) String tempPostId) {
-        try {
-            // 이미지 업로드
-            String imageUrl = imageService.uploadImage(file, tempPostId, postId);
+        // 이미지 업로드
+        String imageUrl = imageService.uploadImage(file, tempPostId, postId);
 
-            Map<String, String> response = new HashMap<>();
-            response.put("imageUrl", imageUrl);
-            // CKEditor에 이미지 URL 반환
-            return ResponseEntity.ok(response);
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+        Map<String, String> response = new HashMap<>();
+        response.put("imageUrl", imageUrl);
+        // CKEditor에 이미지 URL 반환
+        return ResponseEntity.ok(response);
     }
 
     // 이미지 삭제
     @DeleteMapping("delete")
     public ResponseEntity<?> deleteImage(@RequestParam("fileName") String fileName) {
-        try {
-            imageService.deleteImage(fileName);
-            return ResponseEntity.noContent().build();
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
-        }
+        imageService.deleteImage(fileName);
+        return ResponseEntity.noContent().build();
     }
 }
