@@ -27,6 +27,9 @@ public interface AdminMapper {
     // 4. 비밀번호 초기화
     void resetPassword(@Param("adminId") int adminId, @Param("password") String password);
 
+    // 4. 비밀번호 초기화 (다중)
+    int resetPasswords(@Param("adminIds") List<Integer> adminIds, @Param("password") String password);
+
     // 5. 비밀번호 동일성 체크
     String getCurrentPassword(@Param("adminId") int adminId);
 

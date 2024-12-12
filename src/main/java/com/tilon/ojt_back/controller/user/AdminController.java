@@ -60,19 +60,16 @@ public class AdminController {
     }
 
     // 계정 비밀번호 초기화
-    @PutMapping("/accounts/{adminId}/reset-password")
-    public ResponseEntity<Map<String, Object>> resetPassword(@PathVariable(name = "adminId") int adminId) {
-        logger.info("비밀번호 리셋할 어드민 아이디: {}", adminId);
-        try {
-            // 비밀번호 초기화 요청을 서비스에 전달
-            ResponseEntity<Map<String, Object>> response = adminService.resetPassword(adminId);
-            return response;
-        } catch (Exception e) {
-            logger.error("비밀번호 초기화 중 오류 발생: {}", e.getMessage());
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "비밀번호 초기화 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    @PutMapping("/accounts/reset-password")
+    public ResponseEntity<Map<String, Object>> resetPassword(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody Map<String, Object> payload) {
+        if (!authorizationHeader.startsWith("Bearer ")) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
+
+        String token = authorizationHeader.substring(7);
+        return adminService.resetPassword(token, payload);
     }
 
     // 2. super_admin + admin 권한 필요
@@ -83,39 +80,26 @@ public class AdminController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestHeader("Refresh-Token") String refreshTokenHeader) {
 
+        // 토큰 유효성 검사
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "유효한 액세스 토큰이 필요합니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
 
-        if (refreshTokenHeader == null) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "유효한 리프레시 토큰이 필요합니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        if (refreshTokenHeader == null || !jwtTokenProvider.validateRefreshToken(refreshTokenHeader)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        String accessToken = authorizationHeader.substring(7); // "Bearer " 이후의 액세스 토큰 추출
+        String accessToken = authorizationHeader.substring(7);
         logger.info("로그아웃을 요청한 액세스 토큰: {}", accessToken);
         logger.info("로그아웃을 요청한 리프레시 토큰: {}", refreshTokenHeader);
 
-        try {
-            // 액세스 토큰 무효화
-            jwtTokenProvider.invalidateToken(accessToken);
+        // 토큰 무효화 처리
+        jwtTokenProvider.invalidateToken(accessToken);
+        jwtTokenProvider.invalidateToken(refreshTokenHeader);
 
-            // 리프레시 토큰 무효화
-            jwtTokenProvider.invalidateToken(refreshTokenHeader);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "성공적으로 로그아웃되었습니다.");
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("로그아웃 중 오류 발생: {}", e.getMessage());
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "로그아웃 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "성공적으로 로그아웃되었습니다.");
+        return ResponseEntity.ok(response);
     }
 
     // 어드민 삭제 (비밀번호 확인 추가)
@@ -124,7 +108,7 @@ public class AdminController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody Map<String, Object> payload) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new CustomException(ErrorCode.BAD_REQUEST); // 유효한 토큰이 필요합니다.
+            throw new CustomException(ErrorCode.UNAUTHORIZED); // 유효한 토큰이 필요합니다.
         }
 
         String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
@@ -146,9 +130,6 @@ public class AdminController {
         }
 
         String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
-
-        logger.info("어드민 정보 수정 요청한 토큰: {}", token);
-        logger.info("수정할 정보: {}", adminUpdateDTO);
 
         // 서비스 메서드 호출
         return adminService.updateAdminInfo(adminUpdateDTO, token);

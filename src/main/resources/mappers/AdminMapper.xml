@@ -57,6 +57,18 @@
         WHERE admin_id = #{adminId}
     </update>
 
+        <!-- 4. 비밀번호 일괄 초기화 쿼리 -->
+    <update id="resetPasswords" parameterType="map">
+        UPDATE admin
+        SET password = #{password}
+        WHERE admin_id IN
+        <foreach item="adminId" collection="adminIds" open="(" separator="," close=")">
+            #{adminId}
+        </foreach>
+    </update>
+
+    
+
     <!-- 5. 비밀번호 동일성 체크 아이디로 비밀번호 조회-->
     <select id="getCurrentPassword" parameterType="int" resultType="string">
       SELECT password FROM admin WHERE admin_id = #{adminId}

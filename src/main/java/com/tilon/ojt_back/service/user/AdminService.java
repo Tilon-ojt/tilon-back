@@ -152,25 +152,45 @@ public class AdminService {
 
     // 4. 비밀번호 초기화
 
-    public ResponseEntity<Map<String, Object>> resetPassword(int adminId) {
-        try {
-            // 기본 비밀번호를 인코딩
-            String encodedPassword = passwordEncoder.encode(DEFAULT_PASSWORD);
-
-            // 매퍼를 통해 비밀번호 초기화
-            adminMapper.resetPassword(adminId, encodedPassword);
-
-            // 응답 데이터 구성
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "비밀번호가 성공적으로 초기화되었습니다.");
-            response.put("adminId", adminId);
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            e.printStackTrace(); // 예외 로그 출력
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "비밀번호 초기화 중 오류가 발생했습니다."));
+    public ResponseEntity<Map<String, Object>> resetPassword(String token, Map<String, Object> payload) {
+        // 권한 검증 : 슈퍼 어드민만 가능
+        String userRole = jwtTokenProvider.getUserRoleFromToken(token);
+        if (!"ROLE_SUPER_ADMIN".equals(userRole)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
         }
+
+        // 파라미터 검증
+        List<Integer> adminIds = (List<Integer>) payload.get("adminIds");
+        String password = (String) payload.get("password");
+
+        if (adminIds == null || adminIds.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_ADMIN_IDS);
+        }
+
+        if (password == null || password.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 비밀번호 검증 : 슈퍼 어드민의 비밀번호가 일치하는지
+        int userId = jwtTokenProvider.getUserIdFromToken(token);
+        if (!validatePassword(userId, password)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        // 비밀번호 초기화 실행 : 어드민 리스트를 넘겨서 초기화 실행
+        String encodedDefaultPassword = passwordEncoder.encode(DEFAULT_PASSWORD);
+        int updatedCount = adminMapper.resetPasswords(adminIds, encodedDefaultPassword);
+
+        if (updatedCount != adminIds.size()) {
+            throw new CustomException(ErrorCode.PASSWORD_RESET_FAILED);
+        }
+
+        // 성공 응답
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "비밀번호가 성공적으로 초기화되었습니다.");
+        response.put("status", HttpStatus.OK.value());
+        response.put("updatedCount", updatedCount);
+        return ResponseEntity.ok(response);
     }
 
     // 5. 비밀번호 동일성 체크
@@ -202,10 +222,14 @@ public class AdminService {
     public ResponseEntity<Map<String, Object>> updateAdminInfo(AdminUpdateDTO adminUpdateDTO, String token) {
         int adminId = jwtTokenProvider.getUserIdFromToken(token); // 토큰에서 ID 추출
         String userRole = jwtTokenProvider.getUserRoleFromToken(token); // 역할 추출
+        // AdminId 설정 전후 로그 추가
+        logger.info("AdminId 설정 전: {}", adminUpdateDTO.getAdminId());
         adminUpdateDTO.setAdminId(adminId);
+        logger.info("AdminId 설정 후: {}", adminUpdateDTO.getAdminId());
 
         if ("ROLE_SUPER_ADMIN".equals(userRole)) {
-            throw new CustomException(ErrorCode.FORBIDDEN_SUPER_ADMIN_PASSWORD_CHANGE); // SUPER_ADMIN은 비밀번호를 변경할 수 없습니다.
+            throw new CustomException(ErrorCode.FORBIDDEN_SUPER_ADMIN_PASSWORD_CHANGE); // SUPER_ADMIN은 비밀번호를 변경할 수
+                                                                                        // 없습니다.
         }
 
         // 현재 비밀번호 가져오기
@@ -221,6 +245,8 @@ public class AdminService {
 
         // 현재 비밀번호와 입력된 비밀번호 비교
         if (!passwordEncoder.matches(adminUpdateDTO.getCurrentPassword(), currentPassword)) {
+            logger.debug("현재 비밀번호: {}", currentPassword);
+            logger.debug("입력된 비밀번호: {}", adminUpdateDTO.getCurrentPassword());
             throw new CustomException(ErrorCode.UNAUTHORIZED); // 현재 비밀번호가 일치하지 않습니다.
         }
 
@@ -295,4 +321,5 @@ public class AdminService {
         // 입력된 비밀번호를 암호화하여 비교
         return passwordEncoder.matches(inputPassword, encryptedPassword);
     }
+
 }

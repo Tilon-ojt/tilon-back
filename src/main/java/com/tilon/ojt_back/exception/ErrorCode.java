@@ -16,7 +16,7 @@ public enum ErrorCode {
     CONFLICT(HttpStatus.CONFLICT, "중복된 리소스가 존재합니다."),
     // 500 서버 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),
-    
+
     // post 관련 예외
     INVALID_POST_ID(HttpStatus.BAD_REQUEST, "postId가 유효하지 않습니다."),
     INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리가 유효하지 않습니다."),
@@ -30,12 +30,18 @@ public enum ErrorCode {
     INVALID_POST_STATUS(HttpStatus.BAD_REQUEST, "고정 게시글은 상태 변경이 불가능합니다."),
     INVALID_POST_FIX(HttpStatus.BAD_REQUEST, "게시글이 게시되어 있을 때만 고정 가능합니다."),
 
-    // admin 관련 예외 
+    // admin 관련 예외
     INVALID_EMP_NAME(HttpStatus.BAD_REQUEST, "empName은 영어와 숫자만 포함해야 합니다."),
     FORBIDDEN_SELF_DELETION(HttpStatus.FORBIDDEN, "ADMIN은 본인 계정만 삭제할 수 있습니다."),
-    SAME_PASSWORD(HttpStatus.BAD_REQUEST, "현재 비밀번호와 새 비밀번호가 동일합니다."),
-    FORBIDDEN_SUPER_ADMIN_PASSWORD_CHANGE(HttpStatus.FORBIDDEN, "SUPER_ADMIN은 비밀번호를 변경할 수 없습니다.");
-    
+    SAME_PASSWORD(HttpStatus.CONFLICT, "현재 비밀번호와 새 비밀번호가 동일합니다."),
+    FORBIDDEN_SUPER_ADMIN_PASSWORD_CHANGE(HttpStatus.FORBIDDEN, "SUPER_ADMIN은 비밀번호를 변경할 수 없습니다."),
+    INVALID_ADMIN_IDS(HttpStatus.BAD_REQUEST, "초기화할 어드민 ID 목록이 필요합니다."),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 필요합니다."),
+    PASSWORD_RESET_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호 초기화 중 오류가 발생했습니다."),
+    INVALID_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "유효한 액세스 토큰이 필요합니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효한 리프레시 토큰이 필요합니다."),
+    LOGOUT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "로그아웃 중 오류가 발생했습니다.");
+
     private final HttpStatus httpStatus;
     private final String message;
 
@@ -52,4 +58,3 @@ public enum ErrorCode {
         return message;
     }
 }
-
