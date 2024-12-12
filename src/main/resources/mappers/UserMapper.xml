@@ -7,10 +7,11 @@
     <select id="getPostsRow"
             parameterType="Map"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
-        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link
-        FROM post
-        WHERE category = #{category} AND status = 'PUBLISHED'
-        ORDER BY created_at DESC
+        SELECT p.post_id as postId, p.title, p.content, p.category, p.admin_id as adminId, p.created_at as createdAt, p.updated_at as updatedAt, p.status, p.fix, p.link, pi.file_name as imageUrl
+        FROM post p
+        LEFT JOIN postimages pi ON p.post_id = pi.post_id
+        WHERE p.category = #{category} AND p.status = 'PUBLISHED'
+        ORDER BY p.created_at DESC
         LIMIT #{size} OFFSET #{offset};
     </select>
 
@@ -27,9 +28,10 @@
     <select id="getPostRow"
             parameterType="int"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
-        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link
-        FROM post
-        WHERE post_id = #{postId} AND status = 'PUBLISHED';
+        SELECT p.post_id as postId, p.title, p.content, p.category, p.admin_id as adminId, p.created_at as createdAt, p.updated_at as updatedAt, p.status, p.fix, p.link, pi.file_name as imageUrl
+        FROM post p
+        LEFT JOIN postimages pi ON p.post_id = pi.post_id
+        WHERE p.post_id = #{postId} AND p.status = 'PUBLISHED';
     </select>
 
     <!-- user의 homepage 조회 --> 
