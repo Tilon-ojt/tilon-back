@@ -8,10 +8,11 @@
     <select id="getPostsRow"
             parameterType="java.util.Map"
             resultType="com.tilon.ojt_back.domain.manage.PostResponseDTO">
-        SELECT post_id as postId, title, content, category, admin_id as adminId, created_at as createdAt, updated_at as updatedAt, status, fix, link
-        FROM post
-        WHERE category = #{category}
-        ORDER BY created_at DESC
+        SELECT p.post_id as postId, p.title, p.content, p.category, p.admin_id as adminId, p.created_at as createdAt, p.updated_at as updatedAt, p.status, p.fix, p.link, pi.file_name as imageUrl
+        FROM post p
+        LEFT JOIN postimages pi ON p.post_id = pi.post_id
+        WHERE p.category = #{category}
+        ORDER BY p.created_at DESC
         LIMIT #{size} OFFSET #{offset};
     </select>
 
