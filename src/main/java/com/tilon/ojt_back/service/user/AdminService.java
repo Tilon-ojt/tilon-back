@@ -271,7 +271,8 @@ public class AdminService {
     // 7. 어드민 삭제
 
     @Transactional
-    public Map<String, Object> deleteAdminsWithValidation(String token, Map<String, Object> payload) {
+    public Map<String, Object> deleteAdminsWithValidation(String token, String refreshToken,
+            Map<String, Object> payload) {
         List<Integer> adminIds = (List<Integer>) payload.get("adminIds");
         String password = (String) payload.get("password");
 
@@ -298,10 +299,11 @@ public class AdminService {
         if ("ROLE_ADMIN".equals(userRole)) {
             // ADMIN은 본인 계정만 삭제 가능
             if (!adminIds.contains(userId) || adminIds.size() != 1) {
-                throw new CustomException(ErrorCode.FORBIDDEN_SELF_DELETION); // 본인 계정만 삭제 가능
+                throw new CustomException(ErrorCode.FORBIDDEN_SELF_DELETION);
             }
-            // ADMIN이 본인 계정을 삭제할 때만 토큰 무효화
+            // ADMIN이 본인 계정을 삭제할 때 액세스 토큰과 리프레시 토큰 모두 무효화
             jwtTokenProvider.invalidateToken(token);
+            jwtTokenProvider.invalidateToken(refreshToken);
         }
 
         // SUPER_ADMIN은 모든 ID 삭제 가능

@@ -106,14 +106,15 @@ public class AdminController {
     @DeleteMapping("/account")
     public ResponseEntity<Map<String, Object>> deleteAdmins(
             @RequestHeader("Authorization") String authorizationHeader,
+            @RequestHeader("Refresh-Token") String refreshTokenHeader,
             @RequestBody Map<String, Object> payload) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED); // 유효한 토큰이 필요합니다.
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
-        String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
+        String token = authorizationHeader.substring(7);
 
-        Map<String, Object> response = adminService.deleteAdminsWithValidation(token, payload);
+        Map<String, Object> response = adminService.deleteAdminsWithValidation(token, refreshTokenHeader, payload);
         HttpStatus status = (HttpStatus) response.get("status");
         return ResponseEntity.status(status).body(response);
     }
