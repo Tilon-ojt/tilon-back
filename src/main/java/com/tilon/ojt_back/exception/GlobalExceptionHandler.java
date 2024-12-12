@@ -15,6 +15,7 @@ public class GlobalExceptionHandler {
     // CustomException 처리
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponseDTO> handleCustomException(CustomException e) {
+        e.printStackTrace();
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.getHttpStatus()).body(new ErrorResponseDTO(errorCode));
     }
@@ -22,6 +23,7 @@ public class GlobalExceptionHandler {
     // 공통 예외처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleAllExceptions(Exception e) {
+        e.printStackTrace();
         HttpStatus status;
         ErrorCode errorCode;
 
